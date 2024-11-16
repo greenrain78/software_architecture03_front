@@ -75,6 +75,14 @@ dependencies {
 
 
     implementation(libs.androidx.room.runtime)
-    kapt(libs.androidx.room.compiler)
+//    kapt(libs.androidx.room.compiler)
     implementation(libs.room.ktx)
+
+    val retrofitVersion = "2.6.1"
+// Retrofit 라이브러리
+    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+// Gson Converter 라이브러리
+    implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
+// Scalars Converter 라이브러리
+    implementation("com.squareup.retrofit2:converter-scalars:$retrofitVersion")
 }
