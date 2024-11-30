@@ -1,15 +1,90 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
 local.properties
+
+# Package Files #
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Built application files
+*.ap_
+*.aab
+*.apk
+
+# User-specific configurations
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+/.idea/caches/
+/.idea/libraries/
+/.idea/shelf/
+/.idea/tasks.xml
+/.idea/.name
+/.idea/compiler.xml
+/.idea/copyright/profiles_settings.xml
+/.idea/encodings.xml
+/.idea/misc.xml
+/.idea/scopes/scope_settings.xml
+/.idea/dictionaries
+/.idea/vcs.xml
+/.idea/jsLibraryMappings.xml
+/.idea/datasources.xml
+/.idea/dataSources.ids
+/.idea/sqlDataSources.xml
+/.idea/dynamic.xml
+/.idea/uiDesigner.xml
+/.idea/gradle.xml
+/.idea/jarRepositories.xml
+.idea/*
+/.idea/*
+# IDEA/Android Studio project files, because
+# the project can be imported from settings.gradle.kts
+!.idea/copyright
+# Keep the code styles.
+!/.idea/codeStyles
+/.idea/codeStyles/*
+!/.idea/codeStyles/Project.xml
+!/.idea/codeStyles/codeStyleConfig.xml
+
+
+
+# Android Studio
+/*/build/
+/*/local.properties
+/*/out
+/*/*/build
+/*/*/production
+.navigation/
+*.ipr
+*~
+*.swp
+
+# generated files
+bin/
+gen/
+out/
+build/
+generated/
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Kotlin
+.kotlin
