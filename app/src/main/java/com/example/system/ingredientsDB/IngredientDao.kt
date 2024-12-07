@@ -21,12 +21,16 @@ interface IngredientDao {
     @Delete
     suspend fun delete(ingredient:Ingredient)
 
+    //테스트용
+    @Query("DELETE FROM ingredient")
+    suspend fun deleteAllIngredients()
+
     @Query("SELECT * FROM ingredient")
-    fun getAllIngredients() : Flow<List<Ingredient>>
+    suspend fun getAllIngredients() : List<Ingredient>
 
-    @Query("SELECT * FROM ingredient WHERE expirationDate + 86400 < :expirationDate")
-    fun getExpiredIngredients(expirationDate : LocalDate) : Flow<List<Ingredient>>
+    @Query("SELECT * FROM ingredient WHERE expirationDate < :expirationDate")
+    suspend fun getExpiredIngredients(expirationDate : Long) : List<Ingredient>
 
-    @Query("SELECT * FROM ingredient WHERE expirationDate >= :expirationDate AND expirationDate <= strftime('%s', :expirationDate) + (7 * 86400)")
-    fun getWarningIngredients(expirationDate: LocalDate): Flow<List<Ingredient>>
+    @Query("SELECT * FROM ingredient WHERE expirationDate >= :warningStartDate AND expirationDate <= :warningEndDate")
+    suspend fun getWarningIngredients(warningStartDate: Long, warningEndDate: Long): List<Ingredient>
 }

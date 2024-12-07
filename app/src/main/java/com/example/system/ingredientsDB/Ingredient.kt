@@ -14,7 +14,7 @@ data class Ingredient(
     @ColumnInfo
     var quantity : Int = 0,
     @ColumnInfo
-    var expirationDate : LocalDate = LocalDate.of(1970, 1, 1),
+    var expirationDate : Long = 0,
     @ColumnInfo
     var url : String = ""
 )
