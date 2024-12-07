@@ -65,6 +65,8 @@ dependencies {
     implementation(libs.androidx.room.common)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.places)
+    implementation(libs.androidx.camera.lifecycle)
+    implementation(libs.androidx.camera.view)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -75,14 +77,14 @@ dependencies {
 
 
     implementation(libs.androidx.room.runtime)
-//    kapt(libs.androidx.room.compiler)
+    kapt(libs.androidx.room.compiler)
     implementation(libs.room.ktx)
 
-    val retrofitVersion = "2.6.1"
-// Retrofit 라이브러리
-    implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
-// Gson Converter 라이브러리
-    implementation("com.squareup.retrofit2:converter-gson:$retrofitVersion")
-// Scalars Converter 라이브러리
-    implementation("com.squareup.retrofit2:converter-scalars:$retrofitVersion")
+    implementation(libs.androidx.camera.core)
+    implementation(libs.androidx.camera.camera2)
+    implementation(libs.androidx.camera.lifecycle.v110)
+    implementation(libs.androidx.camera.view.v100alpha03)
+    //noinspection GradleDependency
+    implementation(libs.androidx.activity.compose.v160)
+    implementation(libs.accompanist.permissions)
 }
