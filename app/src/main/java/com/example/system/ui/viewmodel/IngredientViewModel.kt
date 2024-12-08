@@ -1,5 +1,6 @@
-package com.example.system
+package com.example.system.ui.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +14,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-class IngredientViewModel(private val ingredientRepository: IngredientRepository) : ViewModel() {
+class IngredientViewModel(context: Context) : ViewModel() {
+
+    private val ingredientRepository: IngredientRepository =
+        IngredientRepository(context)
+
     var ingredientUiState by mutableStateOf(Ingredient(0, "name", 1, 0, "url"))
         private set
     var expiredDateUiState by mutableLongStateOf(0)

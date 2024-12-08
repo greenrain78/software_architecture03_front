@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.system.ingredientsDB.IngredientDB
 import com.example.system.ingredientsDB.IngredientRepository
+import com.example.system.ui.viewmodel.IngredientViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
