@@ -48,13 +48,13 @@ class IngredientViewModel(context: Context) : ViewModel() {
 
     fun insertIngredient(){
         viewModelScope.launch {
-            ingredientRepository.insertIngredient(ingredientUiState)
+            ingredientRepository.add(ingredientUiState)
         }
     }
 
     fun deleteIngredient(){
         viewModelScope.launch {
-            ingredientRepository.deleteIngredient(ingredientUiState)
+            ingredientRepository.removeIngredient(ingredientUiState)
         }
     }
 
@@ -66,14 +66,14 @@ class IngredientViewModel(context: Context) : ViewModel() {
 
     fun getIngredientList(){
         viewModelScope.launch {
-            _ingredientList.value = ingredientRepository.getIngredientList()
+            _ingredientList.value = ingredientRepository.getAll()
         }
     }
 
     fun getExpiredIngredientList(){
         viewModelScope.launch {
             _expiredIngredientList.value =
-                ingredientRepository.getExpiredIngredientList(expiredDateUiState)
+                ingredientRepository.getExpiredIngredients(expiredDateUiState)
         }
     }
 

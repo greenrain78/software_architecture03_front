@@ -14,8 +14,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val ingredientDB = IngredientDB.getDatabase(this)
             val ingredientDao = ingredientDB.IngredientDao()
-            val ingredientRepository = IngredientRepository(ingredientDao)
-            val ingredientViewModel = IngredientViewModel(ingredientRepository)
+            val ingredientRepository = IngredientRepository(applicationContext)
+            val ingredientViewModel = IngredientViewModel(applicationContext)
 
             //IngredientScreen(ingredientViewModel)
             //IngredientInsertScreen(ingredientViewModel)

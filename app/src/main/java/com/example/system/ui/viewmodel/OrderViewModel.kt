@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 class OrderViewModel(context: Context) : ViewModel() {
 
     private val ingredientRepository = IngredientRepository(context)
-    private val orderRepository = OrderRepository()
+    private val orderRepository = OrderRepository(context)
 
     fun registerAutomaticOrder(ingredient: Ingredient) {
         viewModelScope.launch {
