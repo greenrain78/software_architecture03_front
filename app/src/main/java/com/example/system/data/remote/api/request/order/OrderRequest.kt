@@ -1,4 +1,4 @@
-package com.example.system.data.api.request.order
+package com.example.system.data.remote.api.request.order
 
 
 import com.google.gson.annotations.SerializedName
