@@ -1,7 +1,7 @@
 package com.example.system.data.api
 
-import com.example.system.data.api.request.receipt.RegisterRecipeRequest
-import com.example.system.data.api.response.receipt.ReceiptResponse
+import com.example.system.data.api.request.recipe.RegisterRecipeRequest
+import com.example.system.data.api.response.recipe.RecipeResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -12,15 +12,15 @@ interface RecipeService {
 
     //    suspend fun getRecommendedReceipt(): RecommendedReceipt
     @GET("recipe")
-    suspend fun getReceipt(): ReceiptResponse
+    suspend fun getRecipe(): RecipeResponse
 
     @POST("recipe")
-    suspend fun registerReceipt(
+    suspend fun registerRecipe(
         @Body recipe: RegisterRecipeRequest
     )
 
     @PUT("recipe/{id}")
-    suspend fun putReceipt(
+    suspend fun putRecipe(
         @Body recipe: RegisterRecipeRequest,
         @Path ("id") id: Int
     )

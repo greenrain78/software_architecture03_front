@@ -1,6 +1,6 @@
-package com.example.system.data.api.response.receipt
+package com.example.system.data.api.response.recipe
 
-class ReceiptResponse : ArrayList<RecipeResponseItem>()
+class RecipeResponse : ArrayList<RecipeResponseItem>()
 
 data class RecipeResponseItem(
     val createdAt: String,

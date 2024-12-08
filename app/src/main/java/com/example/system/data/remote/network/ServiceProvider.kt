@@ -16,7 +16,7 @@ object ServiceProvider {
     private val registerServiceInstance: RegisterService =
         RetrofitObject.registerRetrofit.create(RegisterService::class.java)
 
-    fun getReceiptServiceInstance(): RecipeService {
+    fun getRecipeServiceInstance(): RecipeService {
         return recipeServiceInstance
     }
 

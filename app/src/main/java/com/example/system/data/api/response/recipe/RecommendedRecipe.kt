@@ -1,4 +1,4 @@
-package com.example.system.data.api.response.receipt
+package com.example.system.data.api.response.recipe
 
 
 data class RecommendedRecipe(
