@@ -1,9 +1,9 @@
 package com.example.system.data.remote.network
 
-import com.example.system.data.api.OpenAIService
-import com.example.system.data.api.OrderService
-import com.example.system.data.api.RecipeService
-import com.example.system.data.api.RegisterService
+import com.example.system.data.remote.api.OpenAIService
+import com.example.system.data.remote.api.OrderService
+import com.example.system.data.remote.api.RecipeService
+import com.example.system.data.remote.api.RegisterService
 
 object ServiceProvider {
 

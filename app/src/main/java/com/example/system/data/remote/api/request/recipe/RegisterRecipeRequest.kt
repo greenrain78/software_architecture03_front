@@ -1,4 +1,4 @@
-package com.example.system.data.api.request.recipe
+package com.example.system.data.remote.api.request.recipe
 
 
 data class RegisterRecipeRequest(

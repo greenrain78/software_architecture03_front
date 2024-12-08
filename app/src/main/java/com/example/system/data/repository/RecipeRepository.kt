@@ -1,7 +1,7 @@
 package com.example.system.data.repository
 
-import com.example.system.data.api.request.recipe.IngredientRequest
-import com.example.system.data.api.request.recipe.RegisterRecipeRequest
+import com.example.system.data.remote.api.request.recipe.IngredientRequest
+import com.example.system.data.remote.api.request.recipe.RegisterRecipeRequest
 import com.example.system.data.mapper.RecipeMapper.toRecipeList
 import com.example.system.data.model.Recipe
 import com.example.system.data.remote.network.ServiceProvider

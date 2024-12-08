@@ -12,11 +12,13 @@ class RecipeViewModel : ViewModel() {
 
     private val recipeRepository = RecipeRepository()
 
+
     fun getRecipes() =
         viewModelScope.launch {
             recipeRepository.getRecipes()
         }
 
+    // TODO : IngredientRepository 에서 ingredients 를 가져와야 함
     fun postRecipe(ingredients: List<Ingredient>, name: String, description: String) =
         viewModelScope.launch {
             recipeRepository.registerRecipe(ingredients, name, description)

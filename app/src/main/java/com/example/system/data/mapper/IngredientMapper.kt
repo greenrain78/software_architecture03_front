@@ -1,6 +1,6 @@
 package com.example.system.data.mapper
 
-import com.example.system.data.api.response.recipe.IngredientResponse
+import com.example.system.data.remote.api.response.recipe.IngredientResponse
 import com.example.system.ingredientsDB.Ingredient
 
 object IngredientMapper {
