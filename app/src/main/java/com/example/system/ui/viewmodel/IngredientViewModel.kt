@@ -16,8 +16,7 @@ import kotlinx.coroutines.launch
 
 class IngredientViewModel(context: Context) : ViewModel() {
 
-    private val ingredientRepository: IngredientRepository =
-        IngredientRepository(context)
+    private val ingredientRepository: IngredientRepository = IngredientRepository(context)
 
     var ingredientUiState by mutableStateOf(Ingredient(0, "name", 1, 0, "url"))
         private set
