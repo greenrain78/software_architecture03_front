@@ -1,4 +1,4 @@
-package com.example.system.data.api.response
+package com.example.system.data.api.response.receipt
 
 class ReceiptResponse : ArrayList<RecipeResponseItem>()
 

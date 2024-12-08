@@ -1,7 +1,7 @@
 package com.example.system.data.api
 
-import com.example.system.data.api.request.RegisterRecipeRequest
-import com.example.system.data.api.response.ReceiptResponse
+import com.example.system.data.api.request.receipt.RegisterRecipeRequest
+import com.example.system.data.api.response.receipt.ReceiptResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
