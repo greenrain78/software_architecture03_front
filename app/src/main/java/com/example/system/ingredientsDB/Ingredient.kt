@@ -16,5 +16,7 @@ data class Ingredient(
     @ColumnInfo
     var expirationDate : Long = 0,
     @ColumnInfo
-    var url : String = ""
+    var url : String = "",
+    @ColumnInfo
+    var autoOrder : Boolean = false
 )

@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import com.example.system.ingredientsDB.IngredientDB
 import com.example.system.ingredientsDB.IngredientRepository
+import com.example.system.ui.viewmodel.IngredientViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -13,8 +14,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             val ingredientDB = IngredientDB.getDatabase(this)
             val ingredientDao = ingredientDB.IngredientDao()
-            val ingredientRepository = IngredientRepository(ingredientDao)
-            val ingredientViewModel = IngredientViewModel(ingredientRepository)
+            val ingredientRepository = IngredientRepository(applicationContext)
+            val ingredientViewModel = IngredientViewModel(applicationContext)
 
             //IngredientScreen(ingredientViewModel)
             //IngredientInsertScreen(ingredientViewModel)
