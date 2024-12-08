@@ -96,4 +96,9 @@ dependencies {
     //noinspection GradleDependency
     implementation(libs.androidx.activity.compose.v160)
     implementation(libs.accompanist.permissions)
+
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+// Retrofit with Scalar Converter
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
