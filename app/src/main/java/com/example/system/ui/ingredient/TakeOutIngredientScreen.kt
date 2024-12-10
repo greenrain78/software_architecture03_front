@@ -1,5 +1,7 @@
 package com.example.system.ui.ingredient
 
+import androidx.compose.runtime.Composable
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,7 +17,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +36,7 @@ import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
 
 @Composable
-fun IngredientExpirationDateScreen(navController: NavHostController) {
+fun TakeOutIngredientScreen(navController: NavHostController) {
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -47,7 +48,7 @@ fun IngredientExpirationDateScreen(navController: NavHostController) {
                 .background(Color.LightGray),
             navController = navController
         )
-        CenterIngredientDateScreen(
+        CenterIngredientOutputScreen(
             modifier = Modifier
                 .weight(2f) // 가운데 화면이 우측 버튼의 공간까지 차지하도록 설정
                 .fillMaxHeight()
@@ -57,17 +58,16 @@ fun IngredientExpirationDateScreen(navController: NavHostController) {
 }
 
 @Composable
-fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
+fun CenterIngredientOutputScreen(modifier: Modifier = Modifier) {
     val ingredients = remember {
         mutableStateListOf(
-            Triple("계란", "2024.12.12", "2024.12.20"),
-            Triple("계란", "2024.12.12", "2024.12.20"),
-            Triple("계란", "2024.12.12", ""),
-            Triple("계란", "2024.12.12", ""),
-            Triple("계란", "2024.12.12", ""),
-            Triple("계란", "2024.12.12", ""),
-            Triple("계란", "2024.12.12", ""),
-            Triple("양파", "2024.12.10", "")
+            Triple("계란", "100", "10"),
+            Triple("계란", "100", "10"),
+            Triple("계란", "100", ""),
+            Triple("계란", "100", ""),
+            Triple("계란", "100", ""),
+            Triple("계란", "100", ""),
+            Triple("양파", "500", "100")
         )
     }
 
@@ -80,7 +80,7 @@ fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
     ) {
         // 가운데 화면 최상단 제목
         Text(
-            text = "유통기한 관리",
+            text = "전체 식재료 목록",
             fontSize = 20.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -100,13 +100,13 @@ fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
                 fontSize = 16.sp
             )
             Text(
-                text = "현재 유통기한",
+                text = "현재 수량(g)",
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp
             )
             Text(
-                text = "유통기한 입력",
+                text = "꺼낼 수량(g)",
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp
@@ -127,8 +127,8 @@ fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
                     val index = ingredients.indexOf(ingredient)
 
                     var name by remember { mutableStateOf(ingredient.first) }
-                    var currentExpiryDate by remember { mutableStateOf(ingredient.second) }
-                    var inputExpiryDate by remember { mutableStateOf(ingredient.third) }
+                    var quantity by remember { mutableStateOf(ingredient.second) }
+                    var withdrawQuantity by remember { mutableStateOf(ingredient.third) }
 
                     Row(
                         modifier = Modifier
@@ -142,30 +142,29 @@ fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
                             modifier = Modifier.weight(1f)
                         )
                         EditableTextField(
-                            value = currentExpiryDate,
-                            onValueChange = { currentExpiryDate = it },
+                            value = quantity,
+                            onValueChange = { quantity = it },
                             modifier = Modifier.weight(1f)
                         )
                         EditableTextField(
-                            value = inputExpiryDate,
-                            onValueChange = { inputExpiryDate = it },
+                            value = withdrawQuantity,
+                            onValueChange = { withdrawQuantity = it },
                             modifier = Modifier.weight(1f)
                         )
                     }
-
                 }
             }
         }
 
-        // 유통기한 등록 버튼
+        // 식재료 꺼내기 버튼
         Button(
-            onClick = { /* 유통기한 등록 처리 로직 추가 */ },
+            onClick = { /* 꺼내기 처리 로직 추가 */ },
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text(text = "유통기한 수정하기", fontSize = 16.sp)
+            Text(text = "식재료 꺼내기", fontSize = 16.sp)
         }
     }
 }
@@ -173,6 +172,6 @@ fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
 // 프리뷰
 @Preview(showBackground = true, widthDp = 600, heightDp = 400)
 @Composable
-fun PreviewIngredientDateScreen() {
-    IngredientExpirationDateScreen(navController = rememberNavController())
+fun PreviewIngredientOutputScreen() {
+    TakeOutIngredientScreen(navController = rememberNavController())
 }

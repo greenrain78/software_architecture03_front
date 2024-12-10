@@ -29,7 +29,7 @@ import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
 
 @Composable
-fun IngredientScreen(navController: androidx.navigation.NavHostController) {
+fun NewIngredientScreen(navController: androidx.navigation.NavHostController) {
     ForceLandscapeOrientation() // 가로 모드 강제 설정
     Row(
         modifier = androidx.compose.ui.Modifier.fillMaxSize()
@@ -158,7 +158,7 @@ fun CenterIngredientScreen(
 
             // 첫 번째 버튼 - 식재료 등록
             Button(
-                onClick = { navController.navigate("ingredientinput") },
+                onClick = { navController.navigate("addIngredient") },
                 modifier = androidx.compose.ui.Modifier
                     .weight(1f)
                     .padding(horizontal = 4.dp),
@@ -177,7 +177,7 @@ fun CenterIngredientScreen(
 
             // 두 번째 버튼 - 식재료 꺼내기
             Button(
-                onClick = { navController.navigate("ingredientoutput") },
+                onClick = { navController.navigate("takeOutIngredient") },
                 modifier = androidx.compose.ui.Modifier
                     .weight(1f)
                     .padding(horizontal = 4.dp),
@@ -196,7 +196,7 @@ fun CenterIngredientScreen(
 
             // 세 번째 버튼 - 유통기한 입력/수정
             Button(
-                onClick = { navController.navigate("ingredientdate") },
+                onClick = { navController.navigate("ingredientExpirationDate") },
                 modifier = androidx.compose.ui.Modifier
                     .weight(1f)
                     .padding(horizontal = 4.dp),
@@ -239,5 +239,5 @@ fun CenterIngredientScreen(
 @Preview(showBackground = true, widthDp = 600, heightDp = 400)
 @Composable
 fun PreviewIngredientScreen() {
-    IngredientScreen(navController = rememberNavController())
+    NewIngredientScreen(navController = rememberNavController())
 }

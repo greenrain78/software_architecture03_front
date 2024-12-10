@@ -271,7 +271,7 @@ fun RightScreen(modifier: Modifier = Modifier) {
 }
 
 
-@Preview
+@Preview(showBackground = true, widthDp = 600, heightDp = 400)
 @Composable
 fun HomeScreenPreview() {
     HomeScreen(navController = rememberNavController())

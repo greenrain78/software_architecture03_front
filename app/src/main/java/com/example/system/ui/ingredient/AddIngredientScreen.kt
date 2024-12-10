@@ -35,7 +35,7 @@ import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
 
 @Composable
-fun IngredientExpirationDateScreen(navController: NavHostController) {
+fun AddIngredientScreen(navController: NavHostController) {
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -47,27 +47,28 @@ fun IngredientExpirationDateScreen(navController: NavHostController) {
                 .background(Color.LightGray),
             navController = navController
         )
-        CenterIngredientDateScreen(
+        CenterIngredientInputScreen(
             modifier = Modifier
-                .weight(2f) // 가운데 화면이 우측 버튼의 공간까지 차지하도록 설정
+                .weight(2f)
                 .fillMaxHeight()
                 .background(Color.White)
+        )
+        RightIngredientInputScreen(
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight()
+                .background(Color.LightGray),
+            navController = navController
         )
     }
 }
 
 @Composable
-fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
+fun CenterIngredientInputScreen(modifier: Modifier = Modifier) {
     val ingredients = remember {
         mutableStateListOf(
-            Triple("계란", "2024.12.12", "2024.12.20"),
-            Triple("계란", "2024.12.12", "2024.12.20"),
-            Triple("계란", "2024.12.12", ""),
-            Triple("계란", "2024.12.12", ""),
-            Triple("계란", "2024.12.12", ""),
-            Triple("계란", "2024.12.12", ""),
-            Triple("계란", "2024.12.12", ""),
-            Triple("양파", "2024.12.10", "")
+            Triple("계란", "100", "2024.12.12"),
+            Triple("양파", "50", "2024.12.10")
         )
     }
 
@@ -80,7 +81,7 @@ fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
     ) {
         // 가운데 화면 최상단 제목
         Text(
-            text = "유통기한 관리",
+            text = "식재료 정보 입력",
             fontSize = 20.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 16.dp)
@@ -91,7 +92,8 @@ fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 8.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically // 수직 정렬 추가
         ) {
             Text(
                 text = "식재료",
@@ -100,14 +102,14 @@ fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
                 fontSize = 16.sp
             )
             Text(
-                text = "현재 유통기한",
+                text = "수량(g)",
                 modifier = Modifier.weight(1f),
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp
             )
             Text(
-                text = "유통기한 입력",
-                modifier = Modifier.weight(1f),
+                text = "유통기한",
+                modifier = Modifier.weight(1.5f),
                 textAlign = TextAlign.Center,
                 fontSize = 16.sp
             )
@@ -121,58 +123,79 @@ fun CenterIngredientDateScreen(modifier: Modifier = Modifier) {
         ) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.Top
+                verticalArrangement = Arrangement.spacedBy(8.dp) // 목록 간격 설정
             ) {
                 items(ingredients) { ingredient ->
-                    val index = ingredients.indexOf(ingredient)
-
                     var name by remember { mutableStateOf(ingredient.first) }
-                    var currentExpiryDate by remember { mutableStateOf(ingredient.second) }
-                    var inputExpiryDate by remember { mutableStateOf(ingredient.third) }
+                    var quantity by remember { mutableStateOf(ingredient.second) }
+                    var expiryDate by remember { mutableStateOf(ingredient.third) }
 
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically // 수직 정렬 추가
                     ) {
                         EditableTextField(
                             value = name,
                             onValueChange = { name = it },
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 4.dp)
                         )
                         EditableTextField(
-                            value = currentExpiryDate,
-                            onValueChange = { currentExpiryDate = it },
-                            modifier = Modifier.weight(1f)
+                            value = quantity,
+                            onValueChange = { quantity = it },
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(horizontal = 4.dp)
                         )
                         EditableTextField(
-                            value = inputExpiryDate,
-                            onValueChange = { inputExpiryDate = it },
-                            modifier = Modifier.weight(1f)
+                            value = expiryDate,
+                            onValueChange = { expiryDate = it },
+                            modifier = Modifier
+                                .weight(1.5f)
+                                .padding(horizontal = 4.dp)
                         )
                     }
-
                 }
             }
         }
 
-        // 유통기한 등록 버튼
+        // 등록하기 버튼
         Button(
-            onClick = { /* 유통기한 등록 처리 로직 추가 */ },
+            onClick = { /* 등록 처리 로직 추가 */ },
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(8.dp)
         ) {
-            Text(text = "유통기한 수정하기", fontSize = 16.sp)
+            Text(text = "등록하기", fontSize = 16.sp)
         }
     }
 }
 
-// 프리뷰
+@Composable
+fun RightIngredientInputScreen(modifier: Modifier = Modifier, navController: NavHostController) {
+    Button(
+        onClick = { navController.navigate("camera") },
+        modifier = modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        Text(
+            text = "카메라로\n등록하기",
+            fontSize = 18.sp,
+            textAlign = TextAlign.Center,
+            color = Color.White
+        )
+    }
+}
+
+
 @Preview(showBackground = true, widthDp = 600, heightDp = 400)
 @Composable
-fun PreviewIngredientDateScreen() {
-    IngredientExpirationDateScreen(navController = rememberNavController())
+fun PreviewIngredientInputScreen() {
+    AddIngredientScreen(navController = rememberNavController())
 }

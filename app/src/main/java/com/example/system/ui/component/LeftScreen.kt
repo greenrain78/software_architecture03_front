@@ -102,7 +102,7 @@ fun LeftScreen(modifier: Modifier = Modifier, navController: NavHostController) 
 
         // 장보기 예약/주문 버튼
         Button(
-            onClick = { navController.navigate("market") }, // 장보기 예약/주문
+            onClick = { navController.navigate("order") }, // 장보기 예약/주문
             modifier = Modifier
                 .padding(vertical = 5.dp)
                 .width(90.dp)
