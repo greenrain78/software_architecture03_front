@@ -23,9 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.system.ingredientsDB.Ingredient
 import com.example.system.ui.viewmodel.IngredientViewModel
@@ -93,7 +96,7 @@ fun init(ingredientViewModel: IngredientViewModel) {
 @Composable
 fun IngredientScreen(
     context : Context,
-    ingredientViewModel: IngredientViewModel = IngredientViewModel(context)
+    ingredientViewModel: IngredientViewModel = hiltViewModel()
 ) {
     init(ingredientViewModel)
 
@@ -242,3 +245,4 @@ fun IngredientInsertScreen(
         }
     }
 }
+

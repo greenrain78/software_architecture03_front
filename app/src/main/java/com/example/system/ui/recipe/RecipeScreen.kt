@@ -27,13 +27,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
+import com.example.system.ui.viewmodel.RecipeViewModel
 
 @Composable
-fun RecipeScreen(navController: NavHostController) {
+fun RecipeScreen(
+    navController: NavHostController,
+    viewModel: RecipeViewModel = hiltViewModel()
+) {
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -51,13 +56,16 @@ fun RecipeScreen(navController: NavHostController) {
                 .weight(1f)
                 .fillMaxHeight()
                 .background(Color.White),
-            navController = navController
+            navController = navController,
         )
     }
 }
 
 @Composable
-fun CenterRecipeScreen(modifier: Modifier = Modifier, navController: NavHostController) {
+fun CenterRecipeScreen(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+) {
     val recipes = remember {
         mutableStateListOf(
             Triple(
@@ -214,5 +222,5 @@ fun CenterRecipeScreen(modifier: Modifier = Modifier, navController: NavHostCont
 @Preview(showBackground = true, widthDp = 600, heightDp = 400)
 @Composable
 fun PreviewRecipeScreen() {
-    RecipeScreen(navController = rememberNavController())
+    CenterRecipeScreen(navController = rememberNavController())
 }

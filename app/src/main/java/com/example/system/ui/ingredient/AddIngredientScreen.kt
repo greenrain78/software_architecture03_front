@@ -191,6 +191,7 @@ fun RightIngredientInputScreen(modifier: Modifier = Modifier, navController: Nav
             color = Color.White
         )
     }
+    
 }
 
 

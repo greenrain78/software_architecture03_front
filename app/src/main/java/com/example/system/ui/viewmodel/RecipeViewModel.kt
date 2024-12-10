@@ -1,22 +1,26 @@
 package com.example.system.ui.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.system.data.model.Recipe
 import com.example.system.data.repository.RecipeRepository
 import com.example.system.ingredientsDB.Ingredient
-import com.example.system.ingredientsDB.IngredientDao
-import com.example.system.ingredientsDB.IngredientRepository
+import com.example.system.data.repository.IngredientRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class RecipeViewModel(context: Context) : ViewModel() {
+@HiltViewModel
+class RecipeViewModel @Inject constructor(
+    private val recipeRepository: RecipeRepository,
+    private val ingredientRepository: IngredientRepository
+) : ViewModel() {
 
-    private val recipeRepository = RecipeRepository()
-    private val ingredientRepository = IngredientRepository(context)
+//    private val recipeRepository = RecipeRepository()
+//    private val ingredientRepository = IngredientRepository()
 
     private val _uiState = MutableStateFlow(Recipe())
     val uiState: StateFlow<Recipe> = _uiState.asStateFlow()

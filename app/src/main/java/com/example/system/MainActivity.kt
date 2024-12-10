@@ -21,7 +21,9 @@ import com.example.system.ui.recipe.EditRecipeScreen
 import com.example.system.ui.recipe.RecipeScreen
 import com.example.system.ui.recipe.RegisterRecipeScreen
 import com.example.system.ui.theme.SystemTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

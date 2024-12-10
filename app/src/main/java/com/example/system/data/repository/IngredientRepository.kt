@@ -1,11 +1,15 @@
-package com.example.system.ingredientsDB
+package com.example.system.data.repository
 
-import android.content.Context
+import com.example.system.ingredientsDB.Ingredient
+import com.example.system.ingredientsDB.IngredientDao
+import javax.inject.Inject
 
-class IngredientRepository(context: Context) {
+class IngredientRepository @Inject constructor(
+    private val ingredientDao: IngredientDao
+) {
 
-    private val ingredientDao: IngredientDao =
-        IngredientDB.getDatabase(context).IngredientDao()
+//    private val ingredientDao: IngredientDao =
+//        IngredientDB.getDatabase(context).IngredientDao()
 
     suspend fun getAll(): List<Ingredient> = ingredientDao.getAll()
 

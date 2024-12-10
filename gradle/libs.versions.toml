@@ -24,6 +24,7 @@ cameraLifecycle = "1.4.0"
 cameraView = "1.4.0"
 navigationCompose = "2.8.4"
 
+
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 androidx-activity-compose-v160 = { module = "androidx.activity:activity-compose", version.ref = "activityComposeVersion" }

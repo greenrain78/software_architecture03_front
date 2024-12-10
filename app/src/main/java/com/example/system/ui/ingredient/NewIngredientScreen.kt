@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.example.system.ui.component.ForceLandscapeOrientation
+import com.example.system.ui.component.HorizontalButton
 import com.example.system.ui.component.LeftScreen
 
 @Composable
@@ -56,7 +58,7 @@ fun NewIngredientScreen(navController: androidx.navigation.NavHostController) {
 
 @Composable
 fun CenterIngredientScreen(
-    modifier: androidx.compose.ui.Modifier = androidx.compose.ui.Modifier,
+    modifier: Modifier = androidx.compose.ui.Modifier,
     navController: androidx.navigation.NavHostController
 ) {
     Column(
@@ -157,78 +159,13 @@ fun CenterIngredientScreen(
             val textSize = 16.sp // 텍스트 크기 설정
 
             // 첫 번째 버튼 - 식재료 등록
-            Button(
-                onClick = { navController.navigate("addIngredient") },
-                modifier = androidx.compose.ui.Modifier
-                    .weight(1f)
-                    .padding(horizontal = 4.dp),
-                shape = RoundedCornerShape(cornerRadius),
-                contentPadding = PaddingValues(4.dp)
-            ) {
-                Column(
-                    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "식재료", textAlign = TextAlign.Center, fontSize = textSize)
-                    Text(text = "등록", textAlign = TextAlign.Center, fontSize = textSize)
-                }
+            HorizontalButton(text = "식재료 등록") {
+                navController.navigate("addIngredient")
             }
 
             // 두 번째 버튼 - 식재료 꺼내기
-            Button(
-                onClick = { navController.navigate("takeOutIngredient") },
-                modifier = androidx.compose.ui.Modifier
-                    .weight(1f)
-                    .padding(horizontal = 4.dp),
-                shape = RoundedCornerShape(cornerRadius),
-                contentPadding = PaddingValues(4.dp)
-            ) {
-                Column(
-                    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "식재료", textAlign = TextAlign.Center, fontSize = textSize)
-                    Text(text = "꺼내기", textAlign = TextAlign.Center, fontSize = textSize)
-                }
-            }
-
-            // 세 번째 버튼 - 유통기한 입력/수정
-            Button(
-                onClick = { navController.navigate("ingredientExpirationDate") },
-                modifier = androidx.compose.ui.Modifier
-                    .weight(1f)
-                    .padding(horizontal = 4.dp),
-                shape = RoundedCornerShape(cornerRadius),
-                contentPadding = PaddingValues(4.dp)
-            ) {
-                Column(
-                    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "유통기한", textAlign = TextAlign.Center, fontSize = textSize)
-                    Text(text = "입력/수정", textAlign = TextAlign.Center, fontSize = textSize)
-                }
-            }
-
-            // 텍스트 박스 (냉장고 용량)
-            Box(
-                modifier = androidx.compose.ui.Modifier
-                    .weight(1f)
-                    .height(80.dp)
-                    .background(Color.LightGray, RoundedCornerShape(cornerRadius)),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(
-                    modifier = androidx.compose.ui.Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(text = "냉장고 용량", textAlign = TextAlign.Center, fontSize = textSize)
-                    Text(text = "50%", textAlign = TextAlign.Center, fontSize = textSize)
-                }
+            HorizontalButton(text = "식재료 꺼내기") {
+                navController.navigate("takeOutIngredient")
             }
         }
     }

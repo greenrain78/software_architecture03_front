@@ -30,6 +30,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.system.ui.component.ForceLandscapeOrientation
+import com.example.system.ui.component.HorizontalButton
 import com.example.system.ui.component.LeftScreen
 
 @Composable
@@ -155,20 +156,12 @@ fun CenterMarketScreen(modifier: Modifier = Modifier, navController: NavHostCont
                 .padding(top = 8.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Button(
-                onClick = { navController.navigate("orderIngredient") },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(text = "주문하기", fontSize = 16.sp)
+            HorizontalButton(text = "주문하기") {
+                navController.navigate("orderIngredient")
             }
             Spacer(modifier = Modifier.width(8.dp))
-            Button(
-                onClick = { navController.navigate("autoOrder") },
-                modifier = Modifier.weight(1f),
-                shape = RoundedCornerShape(8.dp)
-            ) {
-                Text(text = "자동 주문 설정", fontSize = 16.sp)
+            HorizontalButton(text = "자동 주문 설정") {
+                navController.navigate("autoOrder")
             }
         }
     }

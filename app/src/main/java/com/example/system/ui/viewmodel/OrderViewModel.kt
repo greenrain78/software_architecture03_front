@@ -1,17 +1,20 @@
 package com.example.system.ui.viewmodel
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.system.data.repository.OrderRepository
 import com.example.system.ingredientsDB.Ingredient
-import com.example.system.ingredientsDB.IngredientRepository
+import com.example.system.data.repository.IngredientRepository
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class OrderViewModel(context: Context) : ViewModel() {
+class OrderViewModel @Inject constructor(
+    private val ingredientRepository: IngredientRepository,
+    private val orderRepository: OrderRepository
+) : ViewModel() {
 
-    private val ingredientRepository = IngredientRepository(context)
-    private val orderRepository = OrderRepository(context)
+//    private val ingredientRepository = IngredientRepository(context)
+//    private val orderRepository = OrderRepository(context)
 
     fun registerAutomaticOrder(ingredient: Ingredient) {
         viewModelScope.launch {
