@@ -3,31 +3,41 @@ package com.example.system.di
 import com.example.system.data.repository.IngredientRepository
 import com.example.system.data.repository.OrderRepository
 import com.example.system.data.repository.RecipeRepository
+import com.example.system.ingredientsDB.IngredientDao
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class RepositoryModule {
-    @Binds
+object RepositoryModule {
+    @Provides
     @Singleton
-    abstract fun bindRecipeRepository(
-        recipeRepository: RecipeRepository
-    ): RecipeRepository
+    fun bindRecipeRepository(
+    ): RecipeRepository {
+        return RecipeRepository()
+    }
 
-    @Binds
+    @Provides
     @Singleton
-    abstract fun bindIngredientRepository(
-        ingredientRepository: IngredientRepository
-    ): IngredientRepository
+    fun bindIngredientRepository(
+        ingredientDao: IngredientDao
+    ): IngredientRepository {
+        return IngredientRepository(
+            ingredientDao
+        )
+    }
 
-    @Binds
+//    @Binds
+    @Provides
     @Singleton
-    abstract fun bindOrderRepository(
-        orderRepository: OrderRepository
-    ): OrderRepository
-
+    fun bindOrderRepository(
+    ): OrderRepository {
+        return OrderRepository()
+    }
 }
+
