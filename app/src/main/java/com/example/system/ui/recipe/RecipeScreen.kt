@@ -1,5 +1,6 @@
 package com.example.system.ui.recipe
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -33,12 +35,14 @@ import androidx.navigation.compose.rememberNavController
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
 import com.example.system.ui.viewmodel.RecipeViewModel
+import kotlinx.coroutines.coroutineScope
 
 @Composable
 fun RecipeScreen(
     navController: NavHostController,
     viewModel: RecipeViewModel = hiltViewModel()
 ) {
+    // 뷰모델에서 레시피 리스트를 가져왓 ㅓ저장
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()

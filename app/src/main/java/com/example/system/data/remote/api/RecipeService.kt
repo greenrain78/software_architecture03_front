@@ -11,7 +11,7 @@ import retrofit2.http.Path
 interface RecipeService {
 
     //    suspend fun getRecommendedReceipt(): RecommendedReceipt
-    @GET("recipe")
+    @GET("recipe/")
     suspend fun getRecipe(): RecipeResponse
 
     @POST("recipe")
