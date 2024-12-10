@@ -88,3 +88,6 @@ atlassian-ide-plugin.xml
 
 # Kotlin
 .kotlin
+
+.idea/misc.xml
+.idea/deploymentTargetSelector.xml
