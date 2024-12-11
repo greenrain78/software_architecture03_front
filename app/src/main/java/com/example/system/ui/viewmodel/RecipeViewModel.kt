@@ -1,6 +1,9 @@
 package com.example.system.ui.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.system.data.model.Recipe
@@ -8,8 +11,6 @@ import com.example.system.data.repository.RecipeRepository
 import com.example.system.ingredientsDB.Ingredient
 import com.example.system.data.repository.IngredientRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,30 +27,45 @@ class RecipeViewModel @Inject constructor(
 //    private val ingredientRepository = IngredientRepository()
 
 
-    private val _uiState = MutableStateFlow(Recipe())
-    val uiState: StateFlow<Recipe> = _uiState.asStateFlow()
+    var recipeUiState = MutableStateFlow<List<Recipe>>(emptyList())
 
-    init {
-        getRecipes()
+
+    fun getRecipes() {
+        viewModelScope.launch {
+//            _isLoading.value = true
+            try {
+                val recipes = recipeRepository.getRecipes()
+                recipeUiState.value = recipes
+                Log.d("RecipeViewModel", "Error fetching recipes: $recipes")
+            } catch (e: Exception) {
+                Log.e("RecipeViewModel", "Error fetching recipes: ${e.message}")
+            }
+        }
     }
 
-    private var _recipeList = MutableStateFlow<List<Recipe>>(emptyList())
-    val recipeList: StateFlow<List<Recipe>> = _recipeList.asStateFlow()
-
-    private fun getRecipes() =
+    fun postRecipe(
+        ingredients: String,
+        name: String,
+        description: String
+    ) {
         viewModelScope.launch {
-            val a = recipeRepository.getRecipes()
-            _recipeList.value = a
-        }
+            val ingredientList = ingredients.split(",")
+                .map {
+                    Ingredient(name = it.trim())
+                }.toList()
 
-    suspend fun postRecipe(ingredients: List<Ingredient>, name: String, description: String) =
-        viewModelScope.launch {
-            recipeRepository.registerRecipe(ingredients, name, description)
+            recipeRepository.registerRecipe(ingredientList, name, description)
         }
+    }
 
-    suspend fun modifyRecipe(ingredients: List<Ingredient>, id: Int, name: String, description: String) =
+    suspend fun modifyRecipe(
+        ingredients: List<Ingredient>,
+        id: Int,
+        name: String,
+        description: String
+    ) {
         viewModelScope.launch {
             recipeRepository.putRecipe(ingredients, id, name, description)
         }
-
+    }
 }

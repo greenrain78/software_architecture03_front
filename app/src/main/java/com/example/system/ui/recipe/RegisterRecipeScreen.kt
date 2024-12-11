@@ -23,13 +23,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
+import com.example.system.ui.viewmodel.RecipeViewModel
 
 @Composable
-fun RegisterRecipeScreen(navController: NavHostController) {
+fun RegisterRecipeScreen(
+    navController: NavHostController,
+) {
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -52,10 +56,13 @@ fun RegisterRecipeScreen(navController: NavHostController) {
 }
 
 @Composable
-fun CenterRecipeInputScreen(modifier: Modifier = Modifier) {
-    val recipeName = remember { mutableStateOf("") }
+fun CenterRecipeInputScreen(
+    modifier: Modifier = Modifier,
+    viewModel: RecipeViewModel = hiltViewModel()
+) {
+    val name = remember { mutableStateOf("") }
     val ingredients = remember { mutableStateOf("") }
-    val instructions = remember { mutableStateOf("") }
+    val description = remember { mutableStateOf("") }
 
     Column(
         modifier = modifier
@@ -83,8 +90,8 @@ fun CenterRecipeInputScreen(modifier: Modifier = Modifier) {
         ) {
             // 음식 이름 입력
             TextField(
-                value = recipeName.value,
-                onValueChange = { recipeName.value = it },
+                value = name.value,
+                onValueChange = { name.value = it },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White, RoundedCornerShape(8.dp)) // 배경색 유지
@@ -115,8 +122,8 @@ fun CenterRecipeInputScreen(modifier: Modifier = Modifier) {
 
                 // 요리법 입력
                 TextField(
-                    value = instructions.value,
-                    onValueChange = { instructions.value = it },
+                    value = description.value,
+                    onValueChange = { description.value = it },
                     modifier = Modifier
                         .weight(1f)
                         .fillMaxHeight() // Row의 높이에 맞게 텍스트 필드 확장
@@ -129,7 +136,14 @@ fun CenterRecipeInputScreen(modifier: Modifier = Modifier) {
 
         // 버튼 영역
         Button(
-            onClick = { /* 등록 처리 로직 추가 */ },
+            onClick = {
+                viewModel.postRecipe(
+                    ingredients = ingredients.value,
+                    name = name.value,
+                    description = description.value
+
+                )
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(0.dp),

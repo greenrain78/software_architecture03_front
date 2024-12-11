@@ -9,9 +9,7 @@ import com.example.system.ingredientsDB.Ingredient
 
 class RecipeRepository {
     private val recipeService = ServiceProvider.getRecipeServiceInstance()
-//    fun getRecommendedrecipe() {
-//        receiptService.getRecommendedrecipe()
-//    }
+    private val openAIService = ServiceProvider.getOpenAIServiceInstance()
 
     suspend fun getRecipes(): List<Recipe> {
         return recipeService.getRecipe().toRecipeList()
