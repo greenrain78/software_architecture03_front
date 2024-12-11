@@ -18,16 +18,18 @@ interface IngredientDao {
     @Delete
     suspend fun delete(ingredient:Ingredient)
 
-    //테스트용
-    // 사용 x
-    @Query("DELETE FROM ingredient")
-    suspend fun deleteAllIngredients()
-
     @Query("SELECT * FROM ingredient")
     suspend fun getAll() : List<Ingredient>
 
     @Query("SELECT * FROM ingredient WHERE expirationDate < :expirationDate")
     suspend fun getExpiredIngredients(expirationDate : Long) : List<Ingredient>
+
+
+
+    //테스트용
+    // 사용 x
+    @Query("DELETE FROM ingredient")
+    suspend fun deleteAllIngredients()
 
     // 사용 x
     @Query("SELECT * FROM ingredient WHERE expirationDate >= :warningStartDate AND expirationDate <= :warningEndDate")

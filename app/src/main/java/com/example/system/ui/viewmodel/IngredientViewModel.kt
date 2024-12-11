@@ -7,79 +7,34 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.system.cameraApp.ImageLoader
 import com.example.system.ingredientsDB.Ingredient
 import com.example.system.ingredientsDB.IngredientRepository
+import com.example.system.ingredientsDB.fromLocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 class IngredientViewModel(context: Context) : ViewModel() {
 
     private val ingredientRepository: IngredientRepository = IngredientRepository(context)
+    private val image: ImageLoader = ImageLoader()
 
-    var ingredientUiState by mutableStateOf(Ingredient(0, "name", 1, 0, "url"))
-        private set
-    var expiredDateUiState by mutableLongStateOf(0)
-    var warningStartDateUiState by mutableLongStateOf(0)
-    var warningEndDateUiState by mutableLongStateOf(0)
 
-    private val _ingredientList = MutableStateFlow<List<Ingredient>>(emptyList())
-    private val _expiredIngredientList = MutableStateFlow<List<Ingredient>>(emptyList())
-    private val _warningIngredientList = MutableStateFlow<List<Ingredient>>(emptyList())
 
-    val ingredientList: StateFlow<List<Ingredient>> = _ingredientList.asStateFlow()
-    val expiredIngredientList: StateFlow<List<Ingredient>> = _expiredIngredientList.asStateFlow()
-    val warningIngredientList: StateFlow<List<Ingredient>> = _warningIngredientList.asStateFlow()
+    suspend fun getIngredients() : List<Ingredient> = ingredientRepository.getAll()
 
-    fun updateIngredientUiState(ingredient: Ingredient){
-        ingredientUiState = ingredient
-    }
+    //suspend fun takeIngredient(s : String): Ingredient = ingredientRepository.getIngredientName(image)
 
-    fun updateExpiredDateUiState(expiredDate: Long) {
-        expiredDateUiState = expiredDate
-    }
-
-    fun updateWarningDateUiState(startDate: Long, endDate: Long) {
-        warningStartDateUiState = startDate
-        warningEndDateUiState = endDate
-    }
-
-    fun insertIngredient(){
+    fun addIngredients(ingredient: Ingredient) {
         viewModelScope.launch {
-            ingredientRepository.add(ingredientUiState)
+            ingredientRepository.add(ingredient)
         }
     }
 
-    fun deleteIngredient(){
-        viewModelScope.launch {
-            ingredientRepository.removeIngredient(ingredientUiState)
-        }
-    }
-
-    fun deleteAllIngredients() {
-        viewModelScope.launch {
-            ingredientRepository.deleteAllIngredients()
-        }
-    }
-
-    fun getIngredientList(){
-        viewModelScope.launch {
-            _ingredientList.value = ingredientRepository.getAll()
-        }
-    }
-
-    fun getExpiredIngredientList(){
-        viewModelScope.launch {
-            _expiredIngredientList.value =
-                ingredientRepository.getExpiredIngredients(expiredDateUiState)
-        }
-    }
-
-    fun getWarningIngredientList(){
-        viewModelScope.launch {
-            _warningIngredientList.value =
-                ingredientRepository.getWarningIngredientList(warningStartDateUiState, warningEndDateUiState)
-        }
-    }
+    suspend fun getExpirationIngredients(): List<Ingredient> = fromLocalDate(LocalDate.now())?.let {
+        ingredientRepository.getExpiredIngredients(it)
+    }!!
 }

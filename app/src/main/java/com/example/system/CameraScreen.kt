@@ -1,124 +1,155 @@
 package com.example.system
 
-import android.content.Context
+import android.Manifest
+import android.content.ContentResolver
+import android.content.ContentValues
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.view.PreviewView
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
-import androidx.core.net.toFile
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.rememberPermissionState
-import java.io.File
-import android.Manifest
-import com.google.accompanist.permissions.PermissionStatus
+import com.example.system.cameraApp.CameraApp
+import com.example.system.cameraApp.ImageLoader
+import java.io.InputStream
 
-@OptIn(ExperimentalPermissionsApi::class)
+fun Uri.toBitmap(contentResolver: ContentResolver): Bitmap? {
+    var inputStream: InputStream? = null
+    try {
+        inputStream = contentResolver.openInputStream(this)
+        return BitmapFactory.decodeStream(inputStream)
+    } catch (e: Exception) {
+        Log.e("CameraScreen", "Error while converting Uri to Bitmap: ${e.message}")
+        e.printStackTrace()
+    } finally {
+        inputStream?.close()
+    }
+    return null
+}
+
 @Composable
-fun CaptureImageAndSendToAI() {
+fun CameraScreen() {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val cameraPermissionState = rememberPermissionState(permission = Manifest.permission.CAMERA)
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-    when (cameraPermissionState.status) {
-        is PermissionStatus.Granted -> {
-            CameraPreviewAndCapture(context, lifecycleOwner)
-            Text("Camera permission granted!")
+    val imageLoader = ImageLoader()
+
+    // 카메라 권한을 요청할 ActivityResultLauncher
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            Log.d("CameraScreen", "Camera permission granted")
+        } else {
+            Log.d("CameraScreen", "Camera permission denied")
         }
-        is PermissionStatus.Denied -> {
-            Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                Text("Request Camera Permission")
-            }
-        }
-    }
-}
-
-@Composable
-fun CameraPreviewAndCapture(context: Context, lifecycleOwner: LifecycleOwner) {
-    val cameraProviderFuture = ProcessCameraProvider.getInstance(context)
-    val previewView = remember { PreviewView(context) }
-
-    val imageCapture = remember {
-        ImageCapture.Builder()
-            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
-            .build()
     }
 
-    LaunchedEffect(Unit) {
-        val cameraProvider = cameraProviderFuture.get()
-        val preview = Preview.Builder().build()
-        preview.setSurfaceProvider(previewView.surfaceProvider)
+    // 카메라 권한 확인 및 요청
+    if (ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+    ) {
+        // ActivityResultLauncher 설정
+        val takePhotoLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.TakePicturePreview()
+        ) { takenPhoto: Bitmap? ->
+            if (takenPhoto != null) {
 
-        val cameraSelector = CameraSelector.Builder()
-            .requireLensFacing(CameraSelector.LENS_FACING_FRONT)
-            .build()
+                val contentValues = ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, "captured_image_${System.currentTimeMillis()}.jpg")
+                    put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                    put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+                }
 
-        cameraProvider.bindToLifecycle(lifecycleOwner, cameraSelector, preview, imageCapture)
-    }
+                val uri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        AndroidView(
-            factory = { previewView },
-            modifier = Modifier.weight(1f)
-        )
+                if (uri != null) {
+                    // Bitmap 사진 화면에 표시용
+                    //context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    //    takenPhoto.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    //    outputStream.flush()
+                    //}
 
-        CapturePhotoButton(imageCapture, context)
-    }
-}
+                    val bitmap = uri.toBitmap(context.contentResolver)
+                    imageBitmap = bitmap
 
-@Composable
-fun CapturePhotoButton(imageCapture: ImageCapture, context: Context) {
-    Button(onClick = {
-        val outputOptions = ImageCapture.OutputFileOptions.Builder(
-            createTempFile(context)
-        ).build()
-
-        imageCapture.takePicture(
-            outputOptions,
-            ContextCompat.getMainExecutor(context),
-            object : ImageCapture.OnImageSavedCallback {
-                override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                    val photoFile = outputFileResults.savedUri?.toFile()
-
-                    val bitmap = photoFile?.let {
-                        BitmapFactory.decodeFile(it.absolutePath)
+                    if (bitmap == null) {
+                        Log.e("CameraScreen", "Failed to load Bitmap from Uri")
                     }
-
-                    bitmap?.let { sendToAI(it) }
+                } else {
+                    Log.e("CameraScreen", "Failed to capture image.")
                 }
-
-                override fun onError(exception: ImageCaptureException) {
-                    Log.e("Camera", "Error taking photo: ${exception.message}")
-                }
+            } else {
+                Log.e("CameraScreen", "Photo capture was canceled.")
             }
-        )
-    }) {
-        Text("Capture Image")
+
+        }
+
+        // 권한이 승인된 경우
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.End
+        ) {
+            IconButton(onClick = {
+                // 권한이 승인된 상태에서 카메라 촬영을 실행
+                imageLoader.captureImage(context, takePhotoLauncher) { uri ->
+                    // 촬영된 이미지 URI를 상태로 저장
+                    imageUri = uri
+                    Log.d("CameraScreen", "Captured Image URI: $imageUri")
+                }
+            }) {
+                Text("Take Photo")
+            }
+
+            imageBitmap?.let { bitmap ->
+                Image(
+                    modifier = Modifier
+                        .width(200.dp)
+                        .height(200.dp),
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = "Captured Image"
+                )
+                Text("image")
+            }
+
+            // 이미지가 캡처되면 해당 이미지 URI를 보여주기
+            imageUri?.let {
+                Text("Captured Image URI: $it")
+            }
+
+            IconButton(onClick = {
+                imageLoader.getImageUri()
+                Log.d("CameraScreen", "Captured Image URI: $imageUri")
+            }) {
+                Text("get Photo")
+            }
+        }
+    } else {
+        // 권한이 승인되지 않은 경우 권한을 요청
+        requestPermissionLauncher.launch(Manifest.permission.CAMERA)
     }
-}
-
-fun createTempFile(context: Context): File {
-    val tempFile = File(context.cacheDir, "temp_image_${System.currentTimeMillis()}.jpg")
-    return tempFile
-}
-
-fun sendToAI(bitmap: Bitmap) {
-    Log.d("AI", "Sending image to AI model...")
 }

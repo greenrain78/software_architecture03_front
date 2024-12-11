@@ -3,23 +3,25 @@ package com.example.system
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.system.ingredientsDB.IngredientDB
-import com.example.system.ingredientsDB.IngredientRepository
-import com.example.system.ui.viewmodel.IngredientViewModel
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            val ingredientDB = IngredientDB.getDatabase(this)
-            val ingredientDao = ingredientDB.IngredientDao()
-            val ingredientRepository = IngredientRepository(applicationContext)
-            val ingredientViewModel = IngredientViewModel(applicationContext)
+            //val ingredientDB = IngredientDB.getDatabase(this)
+            //val ingredientDao = ingredientDB.IngredientDao()
+            //val ingredientRepository = IngredientRepository(applicationContext)
+            //val ingredientViewModel = IngredientViewModel(applicationContext)
 
             //IngredientScreen(ingredientViewModel)
             //IngredientInsertScreen(ingredientViewModel)
-            CaptureImageAndSendToAI()
+            //CaptureImageAndSendToAI()
+
+            CameraScreen()
         }
     }
 }

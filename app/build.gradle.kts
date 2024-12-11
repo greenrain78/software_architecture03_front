@@ -27,7 +27,7 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_KEY"))
+        //buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_KEY"))
     }
 
     buildTypes {
@@ -76,6 +76,7 @@ dependencies {
     implementation(libs.places)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.appcompat)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -85,9 +86,13 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
 
+    implementation(libs.ui)
+
     implementation(libs.androidx.room.runtime)
     kapt(libs.androidx.room.compiler)
     implementation(libs.room.ktx)
+
+    implementation(libs.androidx.activity.ktx)
 
     implementation(libs.androidx.camera.core)
     implementation(libs.androidx.camera.camera2)
@@ -99,6 +104,6 @@ dependencies {
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-// Retrofit with Scalar Converter
+    // Retrofit with Scalar Converter
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }
