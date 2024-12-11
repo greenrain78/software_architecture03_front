@@ -9,7 +9,7 @@ import com.example.system.ingredientsDB.IngredientRepository
 import kotlinx.coroutines.launch
 
 class OrderViewModel(context: Context) : ViewModel() {
-
+/*
     private val ingredientRepository = IngredientRepository(context)
     private val orderRepository = OrderRepository(context)
 
@@ -24,4 +24,6 @@ class OrderViewModel(context: Context) : ViewModel() {
             orderRepository.order(ingredient)
         }
     }
+
+ */
 }

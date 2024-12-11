@@ -1,6 +1,10 @@
 package com.example.system.ui.viewmodel
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.util.Log
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -17,16 +21,42 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 
-class IngredientViewModel(context: Context) : ViewModel() {
+class IngredientViewModel(private val ingredientRepository: IngredientRepository) : ViewModel() {
 
-    private val ingredientRepository: IngredientRepository = IngredientRepository(context)
     private val image: ImageLoader = ImageLoader()
 
+    private val _ingredients = MutableStateFlow<List<Ingredient>>(emptyList())
+    val ingredients: StateFlow<List<Ingredient>> = _ingredients
+
+    private val _capturedIngredient = MutableStateFlow<Ingredient>(Ingredient())
+    val capturedIngredient: StateFlow<Ingredient> = _capturedIngredient
+
+    private val _expirationIngredients = MutableStateFlow<List<Ingredient>>(emptyList())
+    val expirationIngredients: StateFlow<List<Ingredient>> = _expirationIngredients
 
 
-    suspend fun getIngredients() : List<Ingredient> = ingredientRepository.getAll()
+    fun getIngredients() {
+        viewModelScope.launch {
+            _ingredients.value = ingredientRepository.getAll()
+        }
+    }
 
-    //suspend fun takeIngredient(s : String): Ingredient = ingredientRepository.getIngredientName(image)
+    fun getCapturedIngredient(
+        context: Context,
+        cameraLauncher: ManagedActivityResultLauncher<Void?, Bitmap?>
+    ){
+        image.captureImage(context, cameraLauncher)
+    }
+
+    fun recognizeIngredientFromImage() {
+        val imageUri = image.getImageUri()
+
+        if (imageUri != Uri.EMPTY) {
+            viewModelScope.launch {
+                //capturedIngredient.value.name = ingredientRepository.getIngredientName(imageUri)
+            }
+        }
+    }
 
     fun addIngredients(ingredient: Ingredient) {
         viewModelScope.launch {
@@ -34,7 +64,11 @@ class IngredientViewModel(context: Context) : ViewModel() {
         }
     }
 
-    suspend fun getExpirationIngredients(): List<Ingredient> = fromLocalDate(LocalDate.now())?.let {
-        ingredientRepository.getExpiredIngredients(it)
-    }!!
+    fun getExpirationIngredients() {
+        viewModelScope.launch {
+            _expirationIngredients.value = fromLocalDate(LocalDate.now())?.let {
+                ingredientRepository.getExpiredIngredients(it)
+            }!!
+        }
+    }
 }

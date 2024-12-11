@@ -3,11 +3,9 @@ package com.example.system.ingredientsDB
 import android.content.Context
 import com.example.system.data.remote.network.ServiceProvider
 
-class IngredientRepository(context: Context) {
+class IngredientRepository(private val ingredientDao: IngredientDao) {
 
-    private val ingredientDao: IngredientDao =
-        IngredientDB.getDatabase(context).IngredientDao()
-    private val serviceProvider: ServiceProvider = ServiceProvider
+    //private val serviceProvider: ServiceProvider = ServiceProvider
 
     suspend fun getAll(): List<Ingredient> = ingredientDao.getAll()
 
@@ -21,7 +19,6 @@ class IngredientRepository(context: Context) {
     suspend fun updateIngredient(ingredient: Ingredient) = ingredientDao.update(ingredient)
 
     //suspend fun getIngredientName(imageUri: Uri) = serviceProvider.getOpenAIServiceInstance().getIngredientName()
-
 
 
     // 사용 x

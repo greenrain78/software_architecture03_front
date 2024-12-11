@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class RecipeViewModel(context: Context) : ViewModel() {
-
+/*
     private val recipeRepository = RecipeRepository()
     private val ingredientRepository = IngredientRepository(context)
 
@@ -39,4 +39,6 @@ class RecipeViewModel(context: Context) : ViewModel() {
             recipeRepository.putRecipe(ingredients, id, name, description)
         }
 
+
+ */
 }
