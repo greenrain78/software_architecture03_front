@@ -58,6 +58,18 @@ class IngredientViewModel(private val ingredientRepository: IngredientRepository
         }
     }
 
+    fun takeoutIngredient(ingredient: Ingredient, quantity: Int) {
+        viewModelScope.launch {
+            if (ingredient.quantity - quantity == 0)
+                ingredientRepository.removeIngredient(ingredient)
+            else {
+                val updateIngredient = ingredient
+                updateIngredient.quantity -= quantity
+                ingredientRepository.updateIngredient(updateIngredient)
+            }
+        }
+    }
+
     fun addIngredients(ingredient: Ingredient) {
         viewModelScope.launch {
             ingredientRepository.add(ingredient)
