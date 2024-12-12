@@ -18,7 +18,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -28,13 +29,28 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.system.data.model.Recipe
+import com.example.system.ingredientsDB.Ingredient
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
+import com.example.system.ui.viewmodel.RecipeViewModel
 
 @Composable
-fun EditRecipeScreen(navController: NavHostController) {
+fun EditRecipeScreen(
+    navController: NavHostController,
+    viewModel: RecipeViewModel = hiltViewModel()
+) {
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getRecipes()
+    }
+
+    val recipes = viewModel.recipeUiState.collectAsState().value
+
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -50,27 +66,21 @@ fun EditRecipeScreen(navController: NavHostController) {
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
-                .background(Color.White)
+                .background(Color.White),
+            recipes = recipes,
+            onButtonClick = { name, ingredients, description ->
+                viewModel.postRecipe(ingredients, name, description)
+            }
         )
     }
 }
 
 @Composable
-fun CenterRecipeEditScreen(modifier: Modifier = Modifier) {
-    val recipes = remember {
-        mutableStateListOf(
-            Triple(
-                "김치찌개",
-                "김치, 물, 돼지고기, 돼지고기, 돼지고기",
-                "김치 볶기, 물 끓이기, 김치 넣기"
-            ),
-            Triple(
-                "된장찌개",
-                "된장, 감자, 양파",
-                "된장 풀기, 감자 끓이기, 양파 볶기"
-            )
-        )
-    }
+fun CenterRecipeEditScreen(
+    modifier: Modifier = Modifier,
+    recipes: List<Recipe>,
+    onButtonClick: (String, String, String) -> Unit
+) {
 
     Column(
         modifier = modifier
@@ -99,7 +109,7 @@ fun CenterRecipeEditScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                items(recipes) { (name, ingredients, instructions) ->
+                items(recipes) { (name, ingredients, description) ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -118,7 +128,10 @@ fun CenterRecipeEditScreen(modifier: Modifier = Modifier) {
                                 .padding(4.dp),
                             placeholder = { Text("음식 이름을 입력하세요") }
                         )
+                        val ingredientsString = ingredients.joinToString(", ") { it.name }
 
+                        val editableIngredients = remember { mutableStateOf(ingredientsString) }
+                        val editableDescription = remember { mutableStateOf(description) }
                         // 재료와 요리법 (높이 동기화)
                         Row(
                             modifier = Modifier
@@ -127,7 +140,7 @@ fun CenterRecipeEditScreen(modifier: Modifier = Modifier) {
                             verticalAlignment = Alignment.Top
                         ) {
                             // 재료 입력
-                            val editableIngredients = remember { mutableStateOf(ingredients) }
+
                             BoxWithConstraints(
                                 modifier = Modifier.weight(1f)
                             ) {
@@ -145,14 +158,13 @@ fun CenterRecipeEditScreen(modifier: Modifier = Modifier) {
                             }
 
                             // 요리법 입력
-                            val editableInstructions = remember { mutableStateOf(instructions) }
                             BoxWithConstraints(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 val maxHeight = constraints.maxHeight
                                 TextField(
-                                    value = editableInstructions.value,
-                                    onValueChange = { editableInstructions.value = it },
+                                    value = editableDescription.value,
+                                    onValueChange = { editableDescription.value = it },
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .heightIn(min = maxHeight.dp)
@@ -162,21 +174,29 @@ fun CenterRecipeEditScreen(modifier: Modifier = Modifier) {
                                 )
                             }
                         }
+                        // 버튼 영역
+                        Button(
+                            onClick = {
+                                onButtonClick(
+                                    editableName.value,
+                                    editableIngredients.value,
+                                    editableDescription.value
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            shape = RoundedCornerShape(8.dp) // 모서리 둥근 사각형
+                        ) {
+                            Text(text = "레시피 수정하기", fontSize = 16.sp)
+                        }
                     }
                 }
             }
+
         }
 
-        // 버튼 영역
-        Button(
-            onClick = { /* 수정 처리 로직 추가 */ },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp),
-            shape = RoundedCornerShape(8.dp) // 모서리 둥근 사각형
-        ) {
-            Text(text = "레시피 수정하기", fontSize = 16.sp)
-        }
+
     }
 }
 
@@ -191,5 +211,28 @@ fun RecipeEditPreviewContent() {
 @Preview(showBackground = true, widthDp = 600, heightDp = 400)
 @Composable
 fun PreviewRecipeEditScreen() {
-    RecipeEditPreviewContent()
+    CenterRecipeEditScreen(
+        recipes = listOf(
+            Recipe(
+                name = "김치찌개",
+                ingredients = listOf(
+                    Ingredient(1, "김치"),
+                    Ingredient(2, "물"),
+                    Ingredient(3, "돼지고기", 1),
+                    Ingredient(4, "양파", 1)
+                ),
+                description = "김치 볶기, 물 끓이기, 김치 넣기"
+            ),
+            Recipe(
+                name = "된장찌개",
+                ingredients = listOf(
+                    Ingredient(1, "된장", 1),
+                    Ingredient(2, "감자", 1),
+                    Ingredient(3, "양파", 1)
+                ),
+                description = "된장 풀기, 감자 끓이기, 양파 볶기"
+            )
+        ),
+        onButtonClick = { _, _, _ -> }
+    )
 }

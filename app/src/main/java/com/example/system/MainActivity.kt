@@ -1,6 +1,5 @@
 package com.example.system
 
-import android.media.MediaDrm.OnSessionLostStateListener
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -14,9 +13,8 @@ import com.example.system.ui.ingredient.AddIngredientScreen
 import com.example.system.ui.ingredient.IngredientExpirationDateScreen
 import com.example.system.ui.ingredient.NewIngredientScreen
 import com.example.system.ui.ingredient.TakeOutIngredientScreen
+import com.example.system.ui.order.AutoOrderRegisterScreen
 import com.example.system.ui.order.AutoOrderScreen
-import com.example.system.ui.order.OrderIngredientScreen
-import com.example.system.ui.order.OrderScreen
 import com.example.system.ui.recipe.EditRecipeScreen
 import com.example.system.ui.recipe.RecipeScreen
 import com.example.system.ui.recipe.RegisterRecipeScreen
@@ -55,9 +53,8 @@ fun AppNavHost(navController: NavHostController) {
         composable("registerRecipe") { RegisterRecipeScreen(navController) }
         composable("editRecipe") { EditRecipeScreen(navController) }
 
-        composable("order") { OrderScreen(navController) }
-        composable("orderIngredient") { OrderIngredientScreen(navController) }
-        composable("autoOrder") { AutoOrderScreen(navController) }
+        composable("order") { AutoOrderScreen(navController) }
+        composable("autoOrder") { AutoOrderRegisterScreen(navController) }
 
     }
 

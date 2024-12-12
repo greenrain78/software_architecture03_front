@@ -28,6 +28,16 @@ class IngredientViewModel @Inject constructor(
     var warningStartDateUiState by mutableLongStateOf(0)
     var warningEndDateUiState by mutableLongStateOf(0)
 
+    // TODO : 자동 주문되는 식재료만 불러오는 기능
+    var autoOrderUiState = MutableStateFlow(emptyList<Ingredient>())
+    fun getAutoOrderIngredients() {
+
+    }
+    // TODO : 자동 주문 추가
+
+    // TODO : 자동 주문 삭제
+
+
     private val _ingredientList = MutableStateFlow<List<Ingredient>>(emptyList())
     private val _expiredIngredientList = MutableStateFlow<List<Ingredient>>(emptyList())
     private val _warningIngredientList = MutableStateFlow<List<Ingredient>>(emptyList())

@@ -29,6 +29,7 @@ class RecipeViewModel @Inject constructor(
 
     var recipeUiState = MutableStateFlow<List<Recipe>>(emptyList())
 
+    var recommendUiState = MutableStateFlow(Recipe())
 
     fun getRecipes() {
         viewModelScope.launch {
@@ -58,14 +59,26 @@ class RecipeViewModel @Inject constructor(
         }
     }
 
-    suspend fun modifyRecipe(
-        ingredients: List<Ingredient>,
+    fun getRecommendedRecipe() {
+        viewModelScope.launch {
+//            recommendUiState = recipeRepository.getRecommendedRecipe()
+        }
+    }
+
+    fun modifyRecipe(
+        ingredients: String,
         id: Int,
         name: String,
         description: String
     ) {
+
+        val ingredientsList = ingredients.split(",")
+            .map {
+                Ingredient(name = it.trim())
+            }.toList()
+
         viewModelScope.launch {
-            recipeRepository.putRecipe(ingredients, id, name, description)
+            recipeRepository.putRecipe(ingredientsList, id, name, description)
         }
     }
 }

@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,13 +26,24 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.HorizontalButton
 import com.example.system.ui.component.LeftScreen
+import com.example.system.ui.viewmodel.IngredientViewModel
+import com.example.system.ui.viewmodel.RecipeViewModel
 
 @Composable
-fun NewIngredientScreen(navController: androidx.navigation.NavHostController) {
+fun NewIngredientScreen(
+    navController: androidx.navigation.NavHostController,
+    viewModel: IngredientViewModel = hiltViewModel()
+    ) {
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.getIngredientList()
+    }
+
     ForceLandscapeOrientation() // 가로 모드 강제 설정
     Row(
         modifier = androidx.compose.ui.Modifier.fillMaxSize()

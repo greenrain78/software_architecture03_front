@@ -166,32 +166,32 @@ fun RecipeCard(recipe: Recipe) {
 }
 
 // 프리뷰
-//@Preview(showBackground = true, widthDp = 600, heightDp = 400)
-//@Composable
-//fun PreviewRecipeScreen() {
-//    CenterRecipeScreen(
-//        navController = rememberNavController(),
-//        recipes = listOf(
-//            // 더미 데이터 만들어줘
-//            Recipe(
-//                name = "김치찌개",
-//                ingredients = listOf(
-//                    Ingredient(1, "김치"),
-//                    Ingredient(2, "물"),
-//                    Ingredient(3, "돼지고기", 1),
-//                    Ingredient(4, "양파", 1)
-//                ),
-//                description = "김치 볶기, 물 끓이기, 김치 넣기"
-//            ),
-//            Recipe(
-//                name = "된장찌개",
-//                ingredients = listOf(
-//                    Ingredient(1, "된장", 1),
-//                    Ingredient(2, "감자", 1),
-//                    Ingredient(3, "양파", 1)
-//                ),
-//                description = "된장 풀기, 감자 끓이기, 양파 볶기"
-//            )
-//        )
-//    )
-//}
+@Preview(showBackground = true, widthDp = 600, heightDp = 400)
+@Composable
+fun PreviewRecipeScreen() {
+    CenterRecipeScreen(
+        navController = rememberNavController(),
+        recipes = listOf(
+            // 더미 데이터 만들어줘
+            Recipe(
+                name = "김치찌개",
+                ingredients = listOf(
+                    Ingredient(1, "김치"),
+                    Ingredient(2, "물"),
+                    Ingredient(3, "돼지고기", 1),
+                    Ingredient(4, "양파", 1)
+                ),
+                description = "김치 볶기, 물 끓이기, 김치 넣기"
+            ),
+            Recipe(
+                name = "된장찌개",
+                ingredients = listOf(
+                    Ingredient(1, "된장", 1),
+                    Ingredient(2, "감자", 1),
+                    Ingredient(3, "양파", 1)
+                ),
+                description = "된장 풀기, 감자 끓이기, 양파 볶기"
+            )
+        )
+    )
+}
