@@ -18,5 +18,7 @@ data class Ingredient(
     @ColumnInfo
     var url : String = "",
     @ColumnInfo
-    var autoOrder : Boolean = false
+    var autoOrder : Boolean = false,
+    @ColumnInfo
+    var orderQuantity : Int = 0,
 )

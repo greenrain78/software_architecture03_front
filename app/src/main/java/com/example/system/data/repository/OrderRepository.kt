@@ -7,7 +7,7 @@ import com.example.system.ingredientsDB.Ingredient
 import com.example.system.ingredientsDB.IngredientDB
 import com.example.system.ingredientsDB.IngredientDao
 
-class OrderRepository(private val context : Context) {
+class OrderRepository {
     private val orderService = ServiceProvider.getOrderServiceInstance()
 
     suspend fun order(ingredient: Ingredient) {
