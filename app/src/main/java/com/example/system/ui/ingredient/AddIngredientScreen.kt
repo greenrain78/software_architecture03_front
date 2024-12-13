@@ -1,5 +1,16 @@
 package com.example.system.ui.ingredient
 
+import android.Manifest
+import android.content.ContentValues
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.os.Environment
+import android.provider.MediaStore
+import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.launch
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -8,31 +19,51 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.system.ingredientsDB.fromLocalDate
+import com.example.system.toBitmap
 import com.example.system.ui.component.EditableTextField
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
+import com.example.system.ui.viewmodel.IngredientViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun AddIngredientScreen(navController: NavHostController) {
@@ -58,19 +89,14 @@ fun AddIngredientScreen(navController: NavHostController) {
                 .weight(1f)
                 .fillMaxHeight()
                 .background(Color.LightGray),
-            navController = navController
         )
     }
 }
 
 @Composable
-fun CenterIngredientInputScreen(modifier: Modifier = Modifier) {
-    val ingredients = remember {
-        mutableStateListOf(
-            Triple("계란", "100", "2024.12.12"),
-            Triple("양파", "50", "2024.12.10")
-        )
-    }
+fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewModel: IngredientViewModel = hiltViewModel()) {
+    val ingredientUiState = ingredientViewModel.ingredientUiState.collectAsState()
+    val ingredients = ingredientUiState.value
 
     Column(
         modifier = modifier
@@ -126,9 +152,15 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.spacedBy(8.dp) // 목록 간격 설정
             ) {
                 items(ingredients) { ingredient ->
-                    var name by remember { mutableStateOf(ingredient.first) }
-                    var quantity by remember { mutableStateOf(ingredient.second) }
-                    var expiryDate by remember { mutableStateOf(ingredient.third) }
+                    var name by remember { mutableStateOf("") }
+                    var quantity by remember { mutableIntStateOf(0) }
+                    var expiryDate by remember { mutableStateOf(LocalDate.now()) }
+
+                    var tempName by remember { mutableStateOf(name) }
+                    var tempQuantity by remember { mutableStateOf(quantity.toString()) }
+                    var tempExpiryDate by remember { mutableStateOf(expiryDate.toString()) }
+
+                    val focusManager = LocalFocusManager.current
 
                     Row(
                         modifier = Modifier
@@ -137,34 +169,104 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier) {
                         verticalAlignment = Alignment.CenterVertically // 수직 정렬 추가
                     ) {
                         EditableTextField(
-                            value = name,
-                            onValueChange = { name = it },
+                            value = tempName,
+                            onValueChange = { tempName = it },
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    focusManager.clearFocus()
+                                }
+                            ),
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 4.dp)
+                                .onFocusChanged { focusState ->
+                                    if (!focusState.isFocused) {
+                                        try {
+                                            name = tempName
+                                        } catch (e: Exception) {
+                                            name = ""
+                                        }
+
+                                        tempName = name
+                                        ingredient.name = name
+                                    }
+                                }
                         )
                         EditableTextField(
-                            value = quantity,
-                            onValueChange = { quantity = it },
+                            value = tempQuantity,
+                            onValueChange = { tempQuantity = it},
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    focusManager.clearFocus()
+                                }
+                            ),
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 4.dp)
+                                .onFocusChanged { focusState ->
+                                    if (!focusState.isFocused) {
+                                        try {
+                                            quantity = tempQuantity.toInt()
+                                        } catch (e: Exception) {
+                                            quantity = 0
+                                        }
+
+                                        tempQuantity = quantity.toString()
+                                        ingredient.quantity = quantity
+                                    }
+                                }
                         )
                         EditableTextField(
-                            value = expiryDate,
-                            onValueChange = { expiryDate = it },
+                            value = tempExpiryDate,
+                            onValueChange = { newValue ->
+                                tempExpiryDate = newValue
+                            },
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    focusManager.clearFocus()
+                                }
+                            ),
                             modifier = Modifier
                                 .weight(1.5f)
                                 .padding(horizontal = 4.dp)
+                                .onFocusChanged { focusState ->
+                                    if (!focusState.isFocused) {
+                                        try {
+                                            val newLocalDate = LocalDate.parse(
+                                                tempExpiryDate,
+                                                DateTimeFormatter.ISO_LOCAL_DATE
+                                            )
+                                            expiryDate = newLocalDate
+                                        } catch (e: Exception) {
+                                            expiryDate = LocalDate.now()
+                                        }
+
+                                        tempExpiryDate = expiryDate.toString()
+                                        ingredient.expirationDate = fromLocalDate(expiryDate)!!
+                                    }
+                                }
                         )
                     }
                 }
             }
         }
 
+        // 작성칸 추가 버튼
+        Button(
+            onClick = {
+                ingredientViewModel.addIngredientUiState()
+            },
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            shape = RoundedCornerShape(8.dp)
+        ) {
+            Text(text = "식재료 작성칸 추가", fontSize = 16.sp)
+        }
+
         // 등록하기 버튼
         Button(
-            onClick = { /* 등록 처리 로직 추가 */ },
+            onClick = { ingredientViewModel.addIngredients() },
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
@@ -176,9 +278,55 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun RightIngredientInputScreen(modifier: Modifier = Modifier, navController: NavHostController) {
+fun RightIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewModel: IngredientViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+    //val capturedIngredient by ingredientViewModel.capturedIngredient.collectAsState()
+
+    // 카메라 권한을 요청했을 때의 로직 코드
+    val requestPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) {}
+
+    // 카메라 촬영 이후 로직 코드
+    val takePhotoLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicturePreview()
+    ) { takenPhoto: Bitmap? ->
+        if (takenPhoto != null) {
+            val contentValues = ContentValues().apply {
+                put(
+                    MediaStore.Images.Media.DISPLAY_NAME,
+                    "captured_image_${System.currentTimeMillis()}.jpg"
+                )
+                put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+            }
+
+            val uri = context.contentResolver.insert(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                contentValues
+            )
+
+            if (uri != null) {
+                //ingredientViewModel.recognizeIngredientFromImage()
+                Log.d("CameraScreen", "capture complete")
+            } else {
+                Log.d("CameraScreen", "Failed to capture image.")
+            }
+        } else {
+            Log.d("CameraScreen", "Photo capture was canceled.")
+        }
+    }
+
     Button(
-        onClick = { navController.navigate("camera") },
+        onClick = {
+            //카메라 권한 요청
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                ingredientViewModel.captureIngredient(context, takePhotoLauncher)
+            } else {
+                requestPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+
+        },
         modifier = modifier
             .fillMaxSize()
             .padding(8.dp),

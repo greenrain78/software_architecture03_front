@@ -99,7 +99,7 @@ fun CameraScreen(ingredientViewModel: IngredientViewModel) {
                     val bitmap = uri.toBitmap(context.contentResolver)
                     imageBitmap = bitmap
 
-                    ingredientViewModel.recognizeIngredientFromImage()
+                    //ingredientViewModel.recognizeIngredientFromImage()
 
                     if (bitmap == null) {
                         Log.e("CameraScreen", "Failed to load Bitmap from Uri")

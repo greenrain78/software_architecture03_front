@@ -36,8 +36,8 @@ class IngredientViewModel @Inject constructor(
     private val _expiredIngredientList = MutableStateFlow<List<Ingredient>>(emptyList())
     val expiredIngredientList: StateFlow<List<Ingredient>> = _ingredientList
 
-    private val _ingredientUiState = MutableStateFlow(Ingredient())
-    val ingredientUiState: StateFlow<Ingredient> = _ingredientUiState
+    private val _ingredientUiState = MutableStateFlow<List<Ingredient>>(emptyList())
+    val ingredientUiState: StateFlow<List<Ingredient>> = _ingredientUiState
 
     private val _autoOrderUiState = MutableStateFlow<List<Ingredient>>(emptyList())
     val autoOrderUiState: StateFlow<List<Ingredient>> = _autoOrderUiState
@@ -50,16 +50,20 @@ class IngredientViewModel @Inject constructor(
 
     fun takeoutIngredient() {
         viewModelScope.launch {
+            /*
             if (_ingredientUiState.value.quantity == 0)
                 ingredientRepository.removeIngredient(_ingredientUiState.value)
             else {
                 ingredientRepository.updateIngredient(_ingredientUiState.value)
             }
         }
+
+             */
+        }
     }
 
     fun addAutoOrder() {
-        
+
     }
 
     fun deleteAutoOrder() {
@@ -68,18 +72,22 @@ class IngredientViewModel @Inject constructor(
 
     fun updateIngredient() {
         viewModelScope.launch {
-            ingredientRepository.updateIngredient(_ingredientUiState.value)
+            //ingredientRepository.updateIngredient(_ingredientUiState.value)
         }
     }
 
     fun removeIngredient() {
         viewModelScope.launch {
-            ingredientRepository.removeIngredient(_ingredientUiState.value)
+            //ingredientRepository.removeIngredient(_ingredientUiState.value)
         }
     }
 
-    fun updateIngredientUiState(ingredient: Ingredient) {
-        _ingredientUiState.value = ingredient
+    fun updateIngredientUiState(newIngredientUiState: List<Ingredient>) {
+        _ingredientUiState.value = newIngredientUiState
+    }
+
+    fun addIngredientUiState() {
+        _ingredientUiState.value += Ingredient()
     }
 
 
@@ -91,7 +99,11 @@ class IngredientViewModel @Inject constructor(
 
     fun addIngredients() {
         viewModelScope.launch {
-            ingredientRepository.add(_ingredientUiState.value)
+            for (ingredient in _ingredientUiState.value) {
+                ingredientRepository.add(ingredient)
+            }
+
+            updateIngredientUiState(emptyList())
         }
     }
 
@@ -121,6 +133,4 @@ class IngredientViewModel @Inject constructor(
             }
         }
     }
-
-
 }
