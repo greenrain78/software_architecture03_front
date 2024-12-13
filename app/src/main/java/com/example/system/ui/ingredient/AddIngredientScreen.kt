@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
@@ -57,7 +58,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.system.ingredientsDB.fromLocalDate
-import com.example.system.toBitmap
 import com.example.system.ui.component.EditableTextField
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
@@ -95,8 +95,7 @@ fun AddIngredientScreen(navController: NavHostController) {
 
 @Composable
 fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewModel: IngredientViewModel = hiltViewModel()) {
-    val ingredientUiState = ingredientViewModel.ingredientUiState.collectAsState()
-    val ingredients = ingredientUiState.value
+    val ingredients by ingredientViewModel.ingredientAddUiState.collectAsState()
 
     Column(
         modifier = modifier
@@ -151,14 +150,10 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMod
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp) // 목록 간격 설정
             ) {
-                items(ingredients) { ingredient ->
-                    var name by remember { mutableStateOf("") }
-                    var quantity by remember { mutableIntStateOf(0) }
-                    var expiryDate by remember { mutableStateOf(LocalDate.now()) }
-
-                    var tempName by remember { mutableStateOf(name) }
-                    var tempQuantity by remember { mutableStateOf(quantity.toString()) }
-                    var tempExpiryDate by remember { mutableStateOf(expiryDate.toString()) }
+                itemsIndexed(ingredients) { index, ingredient ->
+                    var tempName by remember { mutableStateOf("") }
+                    var tempQuantity by remember { mutableStateOf("0") }
+                    var tempExpiryDate by remember { mutableStateOf(LocalDate.now().toString().replace("-", ".")) }
 
                     val focusManager = LocalFocusManager.current
 
@@ -181,14 +176,7 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMod
                                 .padding(horizontal = 4.dp)
                                 .onFocusChanged { focusState ->
                                     if (!focusState.isFocused) {
-                                        try {
-                                            name = tempName
-                                        } catch (e: Exception) {
-                                            name = ""
-                                        }
-
-                                        tempName = name
-                                        ingredient.name = name
+                                        ingredientViewModel.updateIngredientAddUiState(index = index, ingredient.copy(name = tempName))
                                     }
                                 }
                         )
@@ -205,14 +193,9 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMod
                                 .padding(horizontal = 4.dp)
                                 .onFocusChanged { focusState ->
                                     if (!focusState.isFocused) {
-                                        try {
-                                            quantity = tempQuantity.toInt()
-                                        } catch (e: Exception) {
-                                            quantity = 0
-                                        }
-
+                                        val quantity = tempQuantity.toIntOrNull() ?: 0
                                         tempQuantity = quantity.toString()
-                                        ingredient.quantity = quantity
+                                        ingredientViewModel.updateIngredientAddUiState(index = index, ingredient.copy(quantity = quantity))
                                     }
                                 }
                         )
@@ -231,18 +214,14 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMod
                                 .padding(horizontal = 4.dp)
                                 .onFocusChanged { focusState ->
                                     if (!focusState.isFocused) {
-                                        try {
-                                            val newLocalDate = LocalDate.parse(
-                                                tempExpiryDate,
-                                                DateTimeFormatter.ISO_LOCAL_DATE
-                                            )
-                                            expiryDate = newLocalDate
+                                        val expiryDate = try {
+                                            LocalDate.parse(tempExpiryDate, DateTimeFormatter.ofPattern("yyyy.MM.dd"))
                                         } catch (e: Exception) {
-                                            expiryDate = LocalDate.now()
+                                            LocalDate.now()
                                         }
 
-                                        tempExpiryDate = expiryDate.toString()
-                                        ingredient.expirationDate = fromLocalDate(expiryDate)!!
+                                        tempExpiryDate = expiryDate.toString().replace("-", ".")
+                                        ingredientViewModel.updateIngredientAddUiState(index = index, ingredient.copy(expirationDate = fromLocalDate(expiryDate)!!))
                                     }
                                 }
                         )
@@ -254,7 +233,7 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMod
         // 작성칸 추가 버튼
         Button(
             onClick = {
-                ingredientViewModel.addIngredientUiState()
+                ingredientViewModel.addIngredientAddUiState()
             },
             modifier = Modifier
                 .padding(8.dp)

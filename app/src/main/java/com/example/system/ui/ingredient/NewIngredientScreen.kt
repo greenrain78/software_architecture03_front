@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,8 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,18 +32,15 @@ import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.HorizontalButton
 import com.example.system.ui.component.LeftScreen
 import com.example.system.ui.viewmodel.IngredientViewModel
-import com.example.system.ui.viewmodel.RecipeViewModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun NewIngredientScreen(
     navController: androidx.navigation.NavHostController,
-    viewModel: IngredientViewModel = hiltViewModel()
-    ) {
+    ingredientViewModel: IngredientViewModel = hiltViewModel()
+) {
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.getIngredients()
+        ingredientViewModel.getIngredients()
     }
 
     ForceLandscapeOrientation() // 가로 모드 강제 설정
@@ -79,7 +73,7 @@ fun CenterIngredientScreen(
     navController: androidx.navigation.NavHostController,
     ingredientViewModel: IngredientViewModel = hiltViewModel()
 ) {
-    val ingredientList by ingredientViewModel.ingredientList.collectAsState()
+    val ingredients by ingredientViewModel.ingredientList.collectAsState()
 
     Column(
         modifier = modifier
@@ -132,7 +126,7 @@ fun CenterIngredientScreen(
                     horizontalAlignment = Alignment.Start
                 ) {
                     // 예제 데이터
-                    items(ingredientList) { ingredient ->
+                    items(ingredients) { ingredient ->
                         Row(
                             modifier = androidx.compose.ui.Modifier
                                 .fillMaxWidth()

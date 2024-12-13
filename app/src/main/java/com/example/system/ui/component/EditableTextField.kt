@@ -18,12 +18,14 @@ import androidx.compose.ui.unit.sp
 fun EditableTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    readOnly: Boolean = false,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     modifier: Modifier = Modifier
 ) {
     TextField(
         value = value,
         onValueChange = onValueChange,
+        readOnly = readOnly,
         keyboardActions = keyboardActions,
         modifier = modifier
             .padding(horizontal = 4.dp)
