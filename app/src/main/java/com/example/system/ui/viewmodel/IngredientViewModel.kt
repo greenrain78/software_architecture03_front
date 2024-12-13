@@ -13,38 +13,79 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.system.cameraApp.ImageLoader
 import com.example.system.ingredientsDB.Ingredient
-import com.example.system.ingredientsDB.IngredientRepository
 import com.example.system.ingredientsDB.fromLocalDate
+import com.example.system.data.repository.IngredientRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import javax.inject.Inject
 
-class IngredientViewModel(private val ingredientRepository: IngredientRepository) : ViewModel() {
+@HiltViewModel
+class IngredientViewModel @Inject constructor(
+    private val ingredientRepository: IngredientRepository
+) : ViewModel() {
 
     private val image: ImageLoader = ImageLoader()
 
-    private val _ingredients = MutableStateFlow<List<Ingredient>>(emptyList())
-    val ingredients: StateFlow<List<Ingredient>> = _ingredients
+    private val _ingredientList = MutableStateFlow<List<Ingredient>>(emptyList())
+    val ingredientList: StateFlow<List<Ingredient>> = _ingredientList
 
-    private val _capturedIngredient = MutableStateFlow<Ingredient>(Ingredient())
-    val capturedIngredient: StateFlow<Ingredient> = _capturedIngredient
+    private val _expiredIngredientList = MutableStateFlow<List<Ingredient>>(emptyList())
+    val expiredIngredientList: StateFlow<List<Ingredient>> = _ingredientList
 
-    private val _expirationIngredients = MutableStateFlow<List<Ingredient>>(emptyList())
-    val expirationIngredients: StateFlow<List<Ingredient>> = _expirationIngredients
+    private val _ingredientUiState = MutableStateFlow(Ingredient())
+    val ingredientUiState: StateFlow<Ingredient> = _ingredientUiState
+
+    // TODO : 자동 주문되는 식재료만 불러오는 기능
+    var autoOrderUiState = MutableStateFlow(emptyList<Ingredient>())
+
+    fun getAutoOrderIngredients() {
+
+    }
+    // TODO : 자동 주문 추가
+    fun addAutoOrder() {
+
+    }
+
+    // TODO : 자동 주문 삭제
+    fun removeAutoOrder() {
+
+    }
+
+    fun updateIngredientUiState(ingredient: Ingredient) {
+        _ingredientUiState.value = ingredient
+    }
 
 
     fun getIngredients() {
         viewModelScope.launch {
-            _ingredients.value = ingredientRepository.getAll()
+            _ingredientList.value = ingredientRepository.getAll()
         }
     }
 
-    fun getCapturedIngredient(
+    fun addIngredients() {
+        viewModelScope.launch {
+            ingredientRepository.add(_ingredientUiState.value)
+        }
+    }
+
+    fun getExpiredIngredients() {
+        viewModelScope.launch {
+            _expiredIngredientList.value = fromLocalDate(LocalDate.now())?.let {
+                ingredientRepository.getExpiredIngredients(
+                    it
+                )
+            }!!
+        }
+    }
+
+    fun captureIngredient(
         context: Context,
         cameraLauncher: ManagedActivityResultLauncher<Void?, Bitmap?>
-    ){
+    ) {
         image.captureImage(context, cameraLauncher)
     }
 
@@ -58,27 +99,13 @@ class IngredientViewModel(private val ingredientRepository: IngredientRepository
         }
     }
 
-    fun takeoutIngredient(ingredient: Ingredient) {
+    fun takeoutIngredient() {
         viewModelScope.launch {
-            if (ingredient.quantity == 0)
-                ingredientRepository.removeIngredient(ingredient)
+            if (_ingredientUiState.value.quantity == 0)
+                ingredientRepository.removeIngredient(_ingredientUiState.value)
             else {
-                ingredientRepository.updateIngredient(ingredient)
+                ingredientRepository.updateIngredient(_ingredientUiState.value)
             }
-        }
-    }
-
-    fun addIngredients(ingredient: Ingredient) {
-        viewModelScope.launch {
-            ingredientRepository.add(ingredient)
-        }
-    }
-
-    fun getExpirationIngredients() {
-        viewModelScope.launch {
-            _expirationIngredients.value = fromLocalDate(LocalDate.now())?.let {
-                ingredientRepository.getExpiredIngredients(it)
-            }!!
         }
     }
 }

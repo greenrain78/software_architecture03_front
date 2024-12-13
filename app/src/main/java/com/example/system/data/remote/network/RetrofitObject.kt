@@ -6,10 +6,10 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitObject {
 
-    private const val RECEIPT_BASE_URL = ""
-    private const val OPENAI_BASE_URL = ""
-    private const val ORDER_BASE_URL = ""
-    private const val REGISTER_BASE_URL = ""
+    private const val RECEIPT_BASE_URL = "http://220.117.110.99:8080/"
+    private const val OPENAI_BASE_URL = "https://api.openai.com/"
+    private const val ORDER_BASE_URL = "http://220.117.110.99:8081/"
+    private const val REGISTER_BASE_URL = "http://220.117.110.99:8080/"
 
     val receiptRetrofit: Retrofit = Retrofit.Builder()
         .baseUrl(RECEIPT_BASE_URL)

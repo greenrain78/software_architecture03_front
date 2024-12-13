@@ -10,21 +10,4 @@ import androidx.room.TypeConverters
 @Database(entities = [Ingredient::class], version = 1)
 abstract class IngredientDB : RoomDatabase() {
     abstract fun IngredientDao() : IngredientDao
-
-    companion object {
-        @Volatile
-        private var INSTANCE: IngredientDB? = null
-
-        fun getDatabase(context: Context): IngredientDB {
-            return INSTANCE ?: synchronized(this) {
-                Room.databaseBuilder(
-                    context.applicationContext,
-                    IngredientDB::class.java,
-                    "database"
-                ).build().also {
-                    INSTANCE = it
-                }
-            }
-        }
-    }
 }
