@@ -27,11 +27,5 @@ class IngredientRepository @Inject constructor(
 
 
     // 사용 x
-    suspend fun getWarningIngredientList(
-        warningStartDate: Long,
-        warningEndDate: Long
-    ): List<Ingredient> = ingredientDao.getWarningIngredients(warningStartDate, warningEndDate)
-
-    // 사용 x
     suspend fun deleteAllIngredients() = ingredientDao.deleteAllIngredients()
 }

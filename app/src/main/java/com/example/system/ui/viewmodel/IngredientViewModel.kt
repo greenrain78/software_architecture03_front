@@ -35,13 +35,17 @@ class IngredientViewModel @Inject constructor(
     val ingredientList: StateFlow<List<Ingredient>> = _ingredientList
 
     private val _expiredIngredientList = MutableStateFlow<List<Ingredient>>(emptyList())
-    val expiredIngredientList: StateFlow<List<Ingredient>> = _ingredientList
+    val expiredIngredientList: StateFlow<List<Ingredient>> = _expiredIngredientList
+
 
     private val _ingredientAddUiState = MutableStateFlow<List<Ingredient>>(emptyList())
     val ingredientAddUiState: StateFlow<List<Ingredient>> = _ingredientAddUiState
 
     private val _ingredientTakeOutUiState = MutableStateFlow<List<Int>>(emptyList())
     val ingredientTakeOutUiState: StateFlow<List<Int>> = _ingredientTakeOutUiState
+
+    private val _ingredientExpirationUiState = MutableStateFlow<List<Ingredient>>(emptyList())
+    val ingredientExpirationUiState: StateFlow<List<Ingredient>> = _ingredientExpirationUiState
 
     private val _autoOrderUiState = MutableStateFlow<List<Ingredient>>(emptyList())
     val autoOrderUiState: StateFlow<List<Ingredient>> = _autoOrderUiState
@@ -81,6 +85,12 @@ class IngredientViewModel @Inject constructor(
     fun getIngredients() {
         viewModelScope.launch {
             _ingredientList.value = ingredientRepository.getAll()
+        }
+    }
+
+    fun getExpiredIngredients() {
+        viewModelScope.launch {
+            _expiredIngredientList.value = ingredientRepository.getExpiredIngredients(fromLocalDate(LocalDate.now())!!)
         }
     }
 
@@ -147,6 +157,33 @@ class IngredientViewModel @Inject constructor(
 
 
 
+    fun initIngredientExpirationUiState() {
+        _ingredientExpirationUiState.value = _ingredientList.value
+    }
+
+    fun updateIngredientExpirationUiState(index: Int, ingredient: Ingredient) {
+        val updatedIngredientList = _ingredientExpirationUiState.value.toMutableList()
+
+        if (updatedIngredientList.isNotEmpty())
+            updatedIngredientList[index] = ingredient
+
+        _ingredientExpirationUiState.value = updatedIngredientList
+    }
+
+    fun changeIngredientExpiration() {
+        Log.d("IngredientViewModel", "ingredient : ${_ingredientExpirationUiState.value}")
+
+        viewModelScope.launch {
+            for (ingredient in _ingredientExpirationUiState.value) {
+                ingredientRepository.updateIngredient(ingredient)
+            }
+
+            getIngredients()
+        }
+    }
+
+
+/*
     fun getExpiredIngredients() {
         viewModelScope.launch {
             _expiredIngredientList.value = fromLocalDate(LocalDate.now())?.let {
@@ -156,6 +193,7 @@ class IngredientViewModel @Inject constructor(
             }!!
         }
     }
+    */
 
 
 

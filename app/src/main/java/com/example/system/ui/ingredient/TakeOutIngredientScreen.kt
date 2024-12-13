@@ -1,8 +1,5 @@
 package com.example.system.ui.ingredient
 
-import android.util.Log
-import androidx.compose.runtime.Composable
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,17 +11,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -50,6 +46,10 @@ fun TakeOutIngredientScreen(
     navController: NavHostController,
     ingredientViewModel: IngredientViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(key1 = true) {
+        ingredientViewModel.getIngredients()
+    }
+
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -138,7 +138,7 @@ fun CenterIngredientOutputScreen(
             ) {
                 itemsIndexed(ingredients) { index, ingredient ->
                     var name by remember { mutableStateOf(ingredient.name) }
-                    var quantity by remember { mutableStateOf(ingredient.quantity) }
+                    var quantity by remember { mutableIntStateOf(ingredient.quantity) }
                     var withdrawQuantity by remember { mutableIntStateOf(0 ) }
 
                     var tempWithdrawQuantity by remember{ mutableStateOf(withdrawQuantity.toString()) }
