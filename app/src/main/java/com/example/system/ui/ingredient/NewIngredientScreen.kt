@@ -41,7 +41,7 @@ fun NewIngredientScreen(
     ) {
 
     LaunchedEffect(key1 = Unit) {
-        viewModel.getIngredientList()
+        viewModel.getIngredients()
     }
 
     ForceLandscapeOrientation() // 가로 모드 강제 설정

@@ -24,7 +24,8 @@ interface IngredientDao {
     @Query("SELECT * FROM ingredient WHERE expirationDate < :expirationDate")
     suspend fun getExpiredIngredients(expirationDate : Long) : List<Ingredient>
 
-
+    @Query("SELECT * FROM ingredient WHERE autoOrder == 1")
+    suspend fun getAutoOrderIngredients() : List<Ingredient>
 
     //테스트용
     // 사용 x

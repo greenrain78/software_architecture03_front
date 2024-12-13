@@ -39,20 +39,43 @@ class IngredientViewModel @Inject constructor(
     private val _ingredientUiState = MutableStateFlow(Ingredient())
     val ingredientUiState: StateFlow<Ingredient> = _ingredientUiState
 
-    // TODO : 자동 주문되는 식재료만 불러오는 기능
-    var autoOrderUiState = MutableStateFlow(emptyList<Ingredient>())
+    private val _autoOrderUiState = MutableStateFlow<List<Ingredient>>(emptyList())
+    val autoOrderUiState: StateFlow<List<Ingredient>> = _autoOrderUiState
 
     fun getAutoOrderIngredients() {
-
+        viewModelScope.launch {
+            _autoOrderUiState.value = ingredientRepository.getAutoOrderIngredient()
+        }
     }
-    // TODO : 자동 주문 추가
+
+    fun takeoutIngredient() {
+        viewModelScope.launch {
+            if (_ingredientUiState.value.quantity == 0)
+                ingredientRepository.removeIngredient(_ingredientUiState.value)
+            else {
+                ingredientRepository.updateIngredient(_ingredientUiState.value)
+            }
+        }
+    }
+
     fun addAutoOrder() {
+        
+    }
+
+    fun deleteAutoOrder() {
 
     }
 
-    // TODO : 자동 주문 삭제
-    fun removeAutoOrder() {
+    fun updateIngredient() {
+        viewModelScope.launch {
+            ingredientRepository.updateIngredient(_ingredientUiState.value)
+        }
+    }
 
+    fun removeIngredient() {
+        viewModelScope.launch {
+            ingredientRepository.removeIngredient(_ingredientUiState.value)
+        }
     }
 
     fun updateIngredientUiState(ingredient: Ingredient) {
@@ -99,13 +122,5 @@ class IngredientViewModel @Inject constructor(
         }
     }
 
-    fun takeoutIngredient() {
-        viewModelScope.launch {
-            if (_ingredientUiState.value.quantity == 0)
-                ingredientRepository.removeIngredient(_ingredientUiState.value)
-            else {
-                ingredientRepository.updateIngredient(_ingredientUiState.value)
-            }
-        }
-    }
+
 }

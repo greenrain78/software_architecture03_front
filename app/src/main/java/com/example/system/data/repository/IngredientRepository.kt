@@ -1,7 +1,7 @@
-package com.example.system.ingredientsDB
+package com.example.system.data.repository
 
-import android.content.Context
-import com.example.system.data.remote.network.ServiceProvider
+import com.example.system.ingredientsDB.Ingredient
+import com.example.system.ingredientsDB.IngredientDao
 
 class IngredientRepository(private val ingredientDao: IngredientDao) {
 
@@ -17,6 +17,8 @@ class IngredientRepository(private val ingredientDao: IngredientDao) {
         ingredientDao.getExpiredIngredients(expiredDate)
 
     suspend fun updateIngredient(ingredient: Ingredient) = ingredientDao.update(ingredient)
+
+    suspend fun getAutoOrderIngredient() = ingredientDao.getAutoOrderIngredients()
 
     //suspend fun getIngredientName(imageUri: Uri) = serviceProvider.getOpenAIServiceInstance().getIngredientName()
 

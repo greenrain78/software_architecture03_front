@@ -4,12 +4,10 @@ import com.example.system.data.repository.IngredientRepository
 import com.example.system.data.repository.OrderRepository
 import com.example.system.data.repository.RecipeRepository
 import com.example.system.ingredientsDB.IngredientDao
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Inject
 import javax.inject.Singleton
 
 @Module
