@@ -15,10 +15,4 @@ data class Ingredient(
     var quantity : Int = 0,
     @ColumnInfo
     var expirationDate : Long = 0,
-    @ColumnInfo
-    var url : String = "",
-    @ColumnInfo
-    var autoOrder : Boolean = false,
-    @ColumnInfo
-    var orderQuantity : Int = 0,
 )

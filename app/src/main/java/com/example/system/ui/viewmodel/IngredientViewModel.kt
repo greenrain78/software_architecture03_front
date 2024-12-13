@@ -15,6 +15,7 @@ import com.example.system.cameraApp.ImageLoader
 import com.example.system.ingredientsDB.Ingredient
 import com.example.system.ingredientsDB.fromLocalDate
 import com.example.system.data.repository.IngredientRepository
+import com.example.system.ingredientsDB.OrderItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -47,37 +48,8 @@ class IngredientViewModel @Inject constructor(
     private val _ingredientExpirationUiState = MutableStateFlow<List<Ingredient>>(emptyList())
     val ingredientExpirationUiState: StateFlow<List<Ingredient>> = _ingredientExpirationUiState
 
-    private val _autoOrderUiState = MutableStateFlow<List<Ingredient>>(emptyList())
-    val autoOrderUiState: StateFlow<List<Ingredient>> = _autoOrderUiState
-
-    fun getAutoOrderIngredients() {
-        viewModelScope.launch {
-            _autoOrderUiState.value = ingredientRepository.getAutoOrderIngredient()
-        }
-    }
-
-
-    fun addAutoOrder() {
-
-    }
-
-    fun deleteAutoOrder() {
-
-    }
-
-    fun updateIngredient() {
-        viewModelScope.launch {
-            //ingredientRepository.updateIngredient(_ingredientUiState.value)
-        }
-    }
-
-    fun removeIngredient() {
-        viewModelScope.launch {
-            //ingredientRepository.removeIngredient(_ingredientUiState.value)
-        }
-    }
-
-
+    private val _autoOrderUiState = MutableStateFlow<List<OrderItem>>(emptyList())
+    val autoOrderUiState: StateFlow<List<OrderItem>> = _autoOrderUiState
 
 
 
@@ -171,8 +143,6 @@ class IngredientViewModel @Inject constructor(
     }
 
     fun changeIngredientExpiration() {
-        Log.d("IngredientViewModel", "ingredient : ${_ingredientExpirationUiState.value}")
-
         viewModelScope.launch {
             for (ingredient in _ingredientExpirationUiState.value) {
                 ingredientRepository.updateIngredient(ingredient)
@@ -183,18 +153,46 @@ class IngredientViewModel @Inject constructor(
     }
 
 
-/*
-    fun getExpiredIngredients() {
+
+
+
+    fun getAutoOrderItems() {
         viewModelScope.launch {
-            _expiredIngredientList.value = fromLocalDate(LocalDate.now())?.let {
-                ingredientRepository.getExpiredIngredients(
-                    it
-                )
-            }!!
+            _autoOrderUiState.value = ingredientRepository.getAllAutoOrderItems()
         }
     }
-    */
 
+    fun changeOrderUiState(autoOrderList: List<OrderItem>){
+        _autoOrderUiState.value = autoOrderList
+    }
+
+
+    fun addAutoOrder() {
+        viewModelScope.launch {
+            for (orderItem in _autoOrderUiState.value)
+                ingredientRepository.addAutoOrder(orderItem)
+
+            getAutoOrderItems()
+        }
+    }
+
+    fun updateAutoOrder() {
+        viewModelScope.launch {
+            for (orderItem in _autoOrderUiState.value)
+                ingredientRepository.updateAutoOrder(orderItem)
+
+            getAutoOrderItems()
+        }
+    }
+
+    fun deleteAutoOrder() {
+        viewModelScope.launch {
+            for (orderItem in _autoOrderUiState.value)
+                ingredientRepository.deleteAutoOrder(orderItem)
+
+            getAutoOrderItems()
+        }
+    }
 
 
 

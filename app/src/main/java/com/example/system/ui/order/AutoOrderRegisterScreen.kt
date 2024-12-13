@@ -17,6 +17,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -41,6 +44,10 @@ fun AutoOrderRegisterScreen(
     ingredientViewModel: IngredientViewModel = hiltViewModel(),
     recipeViewModel: RecipeViewModel = hiltViewModel()
 ) {
+    LaunchedEffect(key1 = Unit) {
+        ingredientViewModel.getAutoOrderItems()
+    }
+
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -65,14 +72,12 @@ fun AutoOrderRegisterScreen(
 }
 
 @Composable
-fun CenterMarketAutoScreen(modifier: Modifier = Modifier, navController: NavHostController) {
-    val itemsList = remember {
-        mutableStateListOf(
-            Pair(mutableStateOf("사과"), mutableStateOf("100")),
-            Pair(mutableStateOf("양파"), mutableStateOf("500")),
-            Pair(mutableStateOf("감자"), mutableStateOf("100"))
-        )
-    }
+fun CenterMarketAutoScreen(
+    modifier: Modifier = Modifier,
+    navController: NavHostController,
+    ingredientViewModel: IngredientViewModel = hiltViewModel()
+) {
+    val autoOrderList by ingredientViewModel.autoOrderUiState.collectAsState()
 
     Column(
         modifier = modifier
@@ -154,7 +159,7 @@ fun CenterMarketAutoScreen(modifier: Modifier = Modifier, navController: NavHost
 
     // 버튼 영역
     Button(
-        onClick = { /* 저장 처리 로직 추가 */ },
+        onClick = { ingredientViewModel.addAutoOrder() },
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),

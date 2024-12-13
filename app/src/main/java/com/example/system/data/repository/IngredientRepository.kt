@@ -2,6 +2,7 @@ package com.example.system.data.repository
 
 import com.example.system.ingredientsDB.Ingredient
 import com.example.system.ingredientsDB.IngredientDao
+import com.example.system.ingredientsDB.OrderItem
 import javax.inject.Inject
 
 class IngredientRepository @Inject constructor(
@@ -21,9 +22,19 @@ class IngredientRepository @Inject constructor(
 
     suspend fun updateIngredient(ingredient: Ingredient) = ingredientDao.update(ingredient)
 
-    suspend fun getAutoOrderIngredient() = ingredientDao.getAutoOrderIngredients()
-
     //suspend fun getIngredientName(imageUri: Uri) = serviceProvider.getOpenAIServiceInstance().getIngredientName()
+
+
+
+
+    suspend fun addAutoOrder(orderItem: OrderItem) = ingredientDao.insertAutoOrderItem(orderItem)
+
+    suspend fun updateAutoOrder(orderItem: OrderItem) = ingredientDao.updateAutoOrderItem(orderItem)
+
+    suspend fun deleteAutoOrder(orderItem: OrderItem) = ingredientDao.deleteAutoOrderItem(orderItem)
+
+    suspend fun getAllAutoOrderItems() : List<OrderItem> = ingredientDao.getAutoOrderItems()
+
 
 
     // 사용 x
