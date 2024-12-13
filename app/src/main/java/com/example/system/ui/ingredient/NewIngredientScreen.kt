@@ -19,6 +19,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,11 +30,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.rememberNavController
+import com.example.system.ingredientsDB.toLocalDate
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.HorizontalButton
 import com.example.system.ui.component.LeftScreen
 import com.example.system.ui.viewmodel.IngredientViewModel
 import com.example.system.ui.viewmodel.RecipeViewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Composable
 fun NewIngredientScreen(
@@ -71,8 +76,11 @@ fun NewIngredientScreen(
 @Composable
 fun CenterIngredientScreen(
     modifier: Modifier = androidx.compose.ui.Modifier,
-    navController: androidx.navigation.NavHostController
+    navController: androidx.navigation.NavHostController,
+    ingredientViewModel: IngredientViewModel = hiltViewModel()
 ) {
+    val ingredientList by ingredientViewModel.ingredientList.collectAsState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -124,13 +132,7 @@ fun CenterIngredientScreen(
                     horizontalAlignment = Alignment.Start
                 ) {
                     // 예제 데이터
-                    items(
-                        listOf(
-                            Triple("계란", "50", "2024.12.15"),
-                            Triple("양파", "100", "2024.12.12"),
-                            Triple("우유", "100", "2024.12.10")
-                        )
-                    ) { (name, quantity, expiryDate) ->
+                    items(ingredientList) { ingredient ->
                         Row(
                             modifier = androidx.compose.ui.Modifier
                                 .fillMaxWidth()
@@ -138,17 +140,19 @@ fun CenterIngredientScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = name,
+                                text = ingredient.name,
                                 modifier = androidx.compose.ui.Modifier.weight(1f),
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = quantity,
+                                text = ingredient.quantity.toString(),
                                 modifier = androidx.compose.ui.Modifier.weight(1f),
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = expiryDate,
+                                text = toLocalDate(ingredient.expirationDate)
+                                    .toString()
+                                    .replace("-", "."),
                                 modifier = androidx.compose.ui.Modifier.weight(1f),
                                 textAlign = TextAlign.Center
                             )
@@ -171,14 +175,22 @@ fun CenterIngredientScreen(
             val textSize = 16.sp // 텍스트 크기 설정
 
             // 첫 번째 버튼 - 식재료 등록
-            HorizontalButton(text = "식재료 등록") {
+            HorizontalButton(text = "식재료\n등록") {
                 navController.navigate("addIngredient")
             }
 
             // 두 번째 버튼 - 식재료 꺼내기
-            HorizontalButton(text = "식재료 꺼내기") {
+            HorizontalButton(text = "식재료\n꺼내기") {
                 navController.navigate("takeOutIngredient")
             }
+
+            // 세 번째 버튼 - 유통기한 정보 입력/수정
+            HorizontalButton(text = "유통기한 정보\n입력/수정") {
+                navController.navigate("ingredientExpirationDate")
+            }
+
+            // 네 번째 텍스트 - 냉장고 용량
+            HorizontalButton(text = "냉장고 용량\n 50%"){}
         }
     }
 }
