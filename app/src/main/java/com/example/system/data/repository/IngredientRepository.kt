@@ -2,8 +2,11 @@ package com.example.system.data.repository
 
 import com.example.system.ingredientsDB.Ingredient
 import com.example.system.ingredientsDB.IngredientDao
+import javax.inject.Inject
 
-class IngredientRepository(private val ingredientDao: IngredientDao) {
+class IngredientRepository @Inject constructor(
+    private val ingredientDao: IngredientDao
+) {
 
     //private val serviceProvider: ServiceProvider = ServiceProvider
 
