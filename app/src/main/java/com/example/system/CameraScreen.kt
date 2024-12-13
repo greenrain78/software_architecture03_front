@@ -56,7 +56,7 @@ fun CameraScreen(ingredientViewModel: IngredientViewModel) {
     val context = LocalContext.current
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
-    val capturedIngredient by ingredientViewModel.capturedIngredient.collectAsState()
+    //val capturedIngredient by ingredientViewModel.capturedIngredient.collectAsState()
 
     // 카메라 권한을 요청할 ActivityResultLauncher
     val requestPermissionLauncher = rememberLauncherForActivityResult(
@@ -123,11 +123,11 @@ fun CameraScreen(ingredientViewModel: IngredientViewModel) {
                     .height(100.dp),
                 onClick = {
                 // 권한이 승인된 상태에서 카메라 촬영을 실행
-                ingredientViewModel.getCapturedIngredient(context, takePhotoLauncher)
+                //ingredientViewModel.getCapturedIngredient(context, takePhotoLauncher)
             }) {
                 Column {
                     Text("Take Photo")
-                    Text("Ingredient : ${capturedIngredient.name}")
+                    //Text("Ingredient : ${capturedIngredient.name}")
                 }
             }
 

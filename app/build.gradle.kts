@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 
     id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 var properties = Properties()
@@ -27,7 +28,7 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_KEY"))
+        //buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_KEY"))
     }
 
     buildTypes {
@@ -76,8 +77,9 @@ dependencies {
     implementation(libs.places)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
-    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -101,6 +103,10 @@ dependencies {
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-// Retrofit with Scalar Converter
+    // Retrofit with Scalar Converter
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 }
