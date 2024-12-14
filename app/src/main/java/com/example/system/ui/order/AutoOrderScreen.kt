@@ -36,6 +36,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.system.PreviewObject
 import com.example.system.ingredientsDB.Ingredient
+import com.example.system.ingredientsDB.OrderItem
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.HorizontalButton
 import com.example.system.ui.component.LeftScreen
@@ -52,7 +53,7 @@ fun AutoOrderScreen(
     ) {
 
         LaunchedEffect(key1 = Unit) {
-            viewModel.getAutoOrderIngredients()
+            viewModel.getAutoOrderItems()
         }
         val autoOrderList = viewModel.autoOrderUiState.collectAsState().value
 
@@ -70,7 +71,7 @@ fun AutoOrderScreen(
                 .fillMaxHeight()
                 .background(Color.White),
             navController = navController,
-            ingredients = autoOrderList
+            autoOrderList = autoOrderList
         )
     }
 }
@@ -79,7 +80,7 @@ fun AutoOrderScreen(
 fun CenterOrderScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    ingredients: List<Ingredient>
+    autoOrderList: List<OrderItem>
 ) {
 
     Column(
@@ -138,7 +139,7 @@ fun CenterOrderScreen(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(ingredients) { ingredient ->
+                items(autoOrderList) { orderItem ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -147,7 +148,7 @@ fun CenterOrderScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = ingredient.name,
+                            text = orderItem.name,
                             fontSize = 14.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -159,7 +160,7 @@ fun CenterOrderScreen(
                                 ) // 좌측 간격 조정
                         )
                         Text(
-                            text = ingredient.orderQuantity.toString(),
+                            text = orderItem.orderQuantity.toString(),
                             fontSize = 14.sp,
                             textAlign = TextAlign.Center,
                             modifier = Modifier
@@ -190,6 +191,7 @@ fun CenterOrderScreen(
     }
 }
 
+/*
 // 프리뷰
 @Preview(showBackground = true, widthDp = 600, heightDp = 400)
 @Composable
@@ -199,3 +201,4 @@ fun PreviewMarketScreen() {
         ingredients = PreviewObject.previewIngredients
     )
 }
+*/

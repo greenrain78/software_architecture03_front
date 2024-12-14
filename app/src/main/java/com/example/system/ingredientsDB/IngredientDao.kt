@@ -23,25 +23,4 @@ interface IngredientDao {
 
     @Query("SELECT * FROM ingredient WHERE expirationDate < :expirationDate")
     suspend fun getExpiredIngredients(expirationDate : Long) : List<Ingredient>
-
-
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAutoOrderItem(orderItem: OrderItem)
-
-    @Update
-    suspend fun updateAutoOrderItem(orderItem: OrderItem)
-
-    @Delete
-    suspend fun deleteAutoOrderItem(orderItem: OrderItem)
-
-    @Query("SELECT * FROM orderitem WHERE autoOrder == 1")
-    suspend fun getAutoOrderItems() : List<OrderItem>
-
-
-
-    //테스트용
-    // 사용 x
-    @Query("DELETE FROM ingredient")
-    suspend fun deleteAllIngredients()
 }

@@ -120,7 +120,7 @@ fun CenterMarketAutoScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .background(Color.Transparent) // 배경 투명 설정
+                //.background(Color.Transparent) // 배경 투명 설정
                 .padding(8.dp)
         ) {
 
@@ -136,7 +136,7 @@ fun CenterMarketAutoScreen(
                     onValueChange = {  },
                     modifier = Modifier
                         .weight(1f)
-                        .background(Color.White, RoundedCornerShape(8.dp))
+                        //.background(Color.White, RoundedCornerShape(8.dp))
                         .padding(4.dp),
                     singleLine = true,
                     placeholder = { Text("상품명을 입력하세요") }
@@ -148,13 +148,23 @@ fun CenterMarketAutoScreen(
                     onValueChange = {  },
                     modifier = Modifier
                         .weight(1f)
-                        .background(Color.White, RoundedCornerShape(8.dp))
+                        //.background(Color.White, RoundedCornerShape(8.dp))
                         .padding(4.dp),
                     singleLine = true,
                     placeholder = { Text("수량을 입력하세요") }
                 )
             }
         }
+    }
+
+    Button(
+        onClick = { ingredientViewModel.addAutoOrder() },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        shape = RoundedCornerShape(8.dp) // 모서리 둥근 사각형
+    ) {
+        Text(text = "주문 내역 추가", fontSize = 16.sp)
     }
 
     // 버튼 영역

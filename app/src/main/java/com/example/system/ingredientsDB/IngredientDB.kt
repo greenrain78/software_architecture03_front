@@ -7,7 +7,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 //import dagger.hilt.android.qualifiers.ApplicationContext
 
-@Database(entities = [Ingredient::class], version = 1)
+@Database(entities = [Ingredient::class, OrderItem::class], version = 2)
 abstract class IngredientDB : RoomDatabase() {
     abstract fun IngredientDao() : IngredientDao
+    abstract fun OrderItemDao(): OrderItemDao
 }
