@@ -3,12 +3,7 @@ package com.example.system.ui.viewmodel
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.system.cameraApp.ImageLoader
@@ -17,10 +12,8 @@ import com.example.system.ingredientsDB.fromLocalDate
 import com.example.system.data.repository.IngredientRepository
 import com.example.system.ingredientsDB.OrderItem
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
@@ -32,9 +25,12 @@ class IngredientViewModel @Inject constructor(
 
     private val image: ImageLoader = ImageLoader()
 
+    
+    //db에 있는 식재료 리스트
     private val _ingredientList = MutableStateFlow<List<Ingredient>>(emptyList())
     val ingredientList: StateFlow<List<Ingredient>> = _ingredientList
 
+    //db에 있는 유통 기한 지난 식재료 리스트
     private val _expiredIngredientList = MutableStateFlow<List<Ingredient>>(emptyList())
     val expiredIngredientList: StateFlow<List<Ingredient>> = _expiredIngredientList
 
@@ -54,13 +50,16 @@ class IngredientViewModel @Inject constructor(
     val capturedImageBitmap: StateFlow<Bitmap?> = _capturedImageBitmap
 
 
-
+    //식재료 꺼내기 화면에서 꺼낼 수량 부분 UI 상태 관리
     private val _ingredientTakeOutUiState = MutableStateFlow<List<Int>>(emptyList())
     val ingredientTakeOutUiState: StateFlow<List<Int>> = _ingredientTakeOutUiState
 
+    //식재료 유통기한 화면에서 변경할 유통 기한 부분 UI 상태 관리
     private val _ingredientExpirationUiState = MutableStateFlow<List<Ingredient>>(emptyList())
     val ingredientExpirationUiState: StateFlow<List<Ingredient>> = _ingredientExpirationUiState
 
+    
+    
     private val _autoOrderList = MutableStateFlow<List<OrderItem>>(emptyList())
     val autoOrderList: StateFlow<List<OrderItem>> = _autoOrderList
 
@@ -69,13 +68,14 @@ class IngredientViewModel @Inject constructor(
 
 
 
-
+    //식재료 리스트 갱신
     fun getIngredients() {
         viewModelScope.launch {
             _ingredientList.value = ingredientRepository.getAll()
         }
     }
 
+    //유통 기한 지난 식재료 리스트 갱신
     fun getExpiredIngredients() {
         viewModelScope.launch {
             _expiredIngredientList.value = ingredientRepository.getExpiredIngredients(fromLocalDate(LocalDate.now())!!)
@@ -90,11 +90,15 @@ class IngredientViewModel @Inject constructor(
     fun updateIngredientAddUiState(
         name: String = _ingredientAddUiState.value.name,
         quantity: Int = _ingredientAddUiState.value.quantity,
-        expirationDate: Long = _ingredientAddUiState.value.expirationDate
+        expirationDate: Long = _ingredientAddUiState.value.expirationDate,
+        uri: Uri = Uri.EMPTY
     ) {
-        _ingredientAddUiState.value.name = name
-        _ingredientAddUiState.value.quantity = quantity
-        _ingredientAddUiState.value.expirationDate = expirationDate
+        _ingredientAddUiState.value = _ingredientAddUiState.value.copy(
+            name = name,
+            quantity = quantity,
+            expirationDate = expirationDate,
+            uri = uri.toString()
+        )
     }
 
     //식재료 추가 버튼 누른 경우
@@ -119,7 +123,7 @@ class IngredientViewModel @Inject constructor(
         _capturedImageBitmap.value = bitmap
     }
 
-    //카메라 찍고 다시 안 찍고 확인을 누르는 경우 AI서버로부터 식재료의 이름을 인식
+    //카메라 찍은 후 확인을 누르는 경우 AI서버로부터 식재료의 이름을 인식
     fun recognizeIngredientFromImage() {
         if (_capturedImageUri.value != Uri.EMPTY) {
             viewModelScope.launch {
@@ -133,21 +137,20 @@ class IngredientViewModel @Inject constructor(
 
 
 
-
-
+    //식재료 꺼내기 화면 부분 UI 관련 함수
+    //꺼낼 수량 0으로 초기화
     fun initIngredientTakeOutUiState() {
         _ingredientTakeOutUiState.value = List(_ingredientList.value.size) { 0 }
     }
 
+    //꺼낼 수량 변경(UI)
     fun updateIngredientTakeOutUiState(index: Int, quantity: Int) {
         val updatedIngredientList = _ingredientTakeOutUiState.value.toMutableList()
-
-        if (updatedIngredientList.isNotEmpty())
-            updatedIngredientList[index] = quantity
-
+        updatedIngredientList[index] = quantity
         _ingredientTakeOutUiState.value = updatedIngredientList
     }
 
+    //꺼내기(DB데이터 변경)
     fun takeoutIngredient() {
         viewModelScope.launch {
             _ingredientList.value.forEachIndexed { index, ingredient ->
@@ -155,42 +158,42 @@ class IngredientViewModel @Inject constructor(
                 val updatedQuantity = ingredient.quantity - withdrawQuantity
 
                 if (updatedQuantity == 0) {
-                    ingredientRepository.removeIngredient(ingredient)
-                    getIngredients()
+                    ingredientRepository.removeIngredient(ingredient) {
+                        getIngredients()
+                    }
                 } else {
-                    ingredientRepository.updateIngredient(ingredient.copy(quantity = updatedQuantity))
-                    getIngredients()
+                    ingredientRepository.updateIngredient(ingredient.copy(quantity = updatedQuantity)) {
+                        getIngredients()
+                    }
                 }
             }
-
-            initIngredientTakeOutUiState()
         }
     }
 
 
 
 
-
+    //식재료 유통기한 변경 화면 부분 UI 관련 함수
+    //유통기한 초기화
     fun initIngredientExpirationUiState() {
         _ingredientExpirationUiState.value = _ingredientList.value
     }
 
+    //유통기한 변경(UI)
     fun updateIngredientExpirationUiState(index: Int, ingredient: Ingredient) {
         val updatedIngredientList = _ingredientExpirationUiState.value.toMutableList()
-
-        if (updatedIngredientList.isNotEmpty())
-            updatedIngredientList[index] = ingredient
-
+        updatedIngredientList[index] = ingredient
         _ingredientExpirationUiState.value = updatedIngredientList
     }
 
+    //유통기한 변경(DB)
     fun changeIngredientExpiration() {
         viewModelScope.launch {
             for (ingredient in _ingredientExpirationUiState.value) {
-                ingredientRepository.updateIngredient(ingredient)
+                ingredientRepository.updateIngredient(ingredient) {
+                    getIngredients()
+                }
             }
-
-            getIngredients()
         }
     }
 

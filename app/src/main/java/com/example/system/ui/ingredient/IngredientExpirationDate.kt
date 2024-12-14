@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -21,7 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -81,9 +79,9 @@ fun CenterIngredientDateScreen(
     ingredientViewModel: IngredientViewModel = hiltViewModel()
 ) {
     val ingredients by ingredientViewModel.ingredientList.collectAsState()
+    val ingredientExpirationUiState by ingredientViewModel.ingredientExpirationUiState.collectAsState()
 
     LaunchedEffect(ingredients) {
-        ingredientViewModel.getIngredients()
         ingredientViewModel.initIngredientExpirationUiState()
     }
 
@@ -139,56 +137,70 @@ fun CenterIngredientDateScreen(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top
             ) {
-                itemsIndexed(ingredients) { index, ingredient ->
-                    var name by remember { mutableStateOf(ingredient.name) }
-                    var currentExpiryDate by remember { mutableStateOf(toLocalDate(ingredient.expirationDate)) }
-                    var tempInputExpiryDate by remember { mutableStateOf(currentExpiryDate.toString().replace("-", ".")) }
+                if (ingredientExpirationUiState.isNotEmpty()) {
+                    itemsIndexed(ingredients) { index, ingredient ->
+                        var tempInputExpiryDate by remember {
+                            mutableStateOf(
+                                toLocalDate(ingredient.expirationDate).toString().replace("-", ".")
+                            )
+                        }
 
-                    val focusManager = LocalFocusManager.current
+                        val focusManager = LocalFocusManager.current
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        EditableTextField(
-                            value = name,
-                            onValueChange = { name = it },
-                            readOnly = true,
-                            modifier = Modifier.weight(1f)
-                        )
-                        EditableTextField(
-                            value = currentExpiryDate.toString().replace("-", "."),
-                            onValueChange = { currentExpiryDate = LocalDate.parse(it) },
-                            readOnly = true,
-                            modifier = Modifier.weight(1f)
-                        )
-                        EditableTextField(
-                            value = tempInputExpiryDate,
-                            onValueChange = { tempInputExpiryDate = it },
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    focusManager.clearFocus()
-                                }
-                            ),
+                        Row(
                             modifier = Modifier
-                                .weight(1f)
-                                .onFocusChanged { focusState ->
-                                if (!focusState.isFocused) {
-                                    val inputExpiryDate = try {
-                                        LocalDate.parse(tempInputExpiryDate, DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-                                    } catch (e: Exception) {
-                                        LocalDate.now()
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            EditableTextField(
+                                value = ingredient.name,
+                                onValueChange = {},
+                                readOnly = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                            EditableTextField(
+                                value = toLocalDate(ingredient.expirationDate).toString()
+                                    .replace("-", "."),
+                                onValueChange = {},
+                                readOnly = true,
+                                modifier = Modifier.weight(1f)
+                            )
+                            EditableTextField(
+                                value = tempInputExpiryDate,
+                                onValueChange = { tempInputExpiryDate = it },
+                                keyboardActions = KeyboardActions(
+                                    onDone = {
+                                        focusManager.clearFocus()
                                     }
+                                ),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .onFocusChanged { focusState ->
+                                        if (!focusState.isFocused) {
+                                            val inputExpiryDate = try {
+                                                LocalDate.parse(
+                                                    tempInputExpiryDate,
+                                                    DateTimeFormatter.ofPattern("yyyy.MM.dd")
+                                                )
+                                            } catch (e: Exception) {
+                                                toLocalDate(ingredient.expirationDate)
+                                            }
 
-                                    tempInputExpiryDate = inputExpiryDate.toString().replace("-", ".")
-                                    ingredientViewModel.updateIngredientExpirationUiState(index = index, ingredient.copy(expirationDate = fromLocalDate(inputExpiryDate)!!))
-                                }
-                            }
-                        )
+                                            tempInputExpiryDate =
+                                                inputExpiryDate.toString().replace("-", ".")
+                                            ingredientViewModel.updateIngredientExpirationUiState(
+                                                index = index,
+                                                ingredient.copy(
+                                                    expirationDate = fromLocalDate(inputExpiryDate)!!
+                                                )
+                                            )
+                                        }
+                                    }
+                            )
+                        }
+
                     }
-
                 }
             }
         }

@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -94,8 +93,9 @@ fun CenterIngredientInputScreen(
     ingredientViewModel: IngredientViewModel = hiltViewModel(),
     isCaptured: MutableState<Boolean>
     ) {
-    val ingredient by ingredientViewModel.ingredientAddUiState.collectAsState()
+    val ingredientAddUiState by ingredientViewModel.ingredientAddUiState.collectAsState()
     val capturedImageBitmap by ingredientViewModel.capturedImageBitmap.collectAsState()
+    val capturedImageUri by ingredientViewModel.capturedImageUri.collectAsState()
 
     Column(
         modifier = modifier
@@ -146,7 +146,6 @@ fun CenterIngredientInputScreen(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            var tempQuantity by remember { mutableStateOf("0") }
             var tempExpiryDate by remember { mutableStateOf(LocalDate.now().toString().replace("-", ".")) }
 
             val focusManager = LocalFocusManager.current
@@ -158,7 +157,7 @@ fun CenterIngredientInputScreen(
                 verticalAlignment = Alignment.CenterVertically // 수직 정렬 추가
             ) {
                 EditableTextField(
-                    value = ingredient.name,
+                    value = ingredientAddUiState.name,
                     onValueChange = {},
                     readOnly = true,
                     modifier = Modifier
@@ -166,8 +165,16 @@ fun CenterIngredientInputScreen(
                         .padding(horizontal = 4.dp)
                 )
                 EditableTextField(
-                    value = tempQuantity,
-                    onValueChange = { tempQuantity = it },
+                    value = ingredientAddUiState.quantity.toString(),
+                    onValueChange = { newText ->
+                        var quantity = newText.toIntOrNull() ?: 0
+
+                        if (quantity < 0)
+                            quantity = 0
+
+                        if (quantity > 0)
+                            ingredientViewModel.updateIngredientAddUiState(quantity = quantity)
+                    },
                     keyboardActions = KeyboardActions(
                         onDone = {
                             focusManager.clearFocus()
@@ -176,13 +183,6 @@ fun CenterIngredientInputScreen(
                     modifier = Modifier
                         .weight(1f)
                         .padding(horizontal = 4.dp)
-                        .onFocusChanged { focusState ->
-                            if (!focusState.isFocused) {
-                                val quantity = tempQuantity.toIntOrNull() ?: 0
-                                tempQuantity = quantity.toString()
-                                ingredientViewModel.updateIngredientAddUiState(quantity = quantity)
-                            }
-                        }
                 )
                 EditableTextField(
                     value = tempExpiryDate,
@@ -218,6 +218,8 @@ fun CenterIngredientInputScreen(
 
         //사진 찍은 후 사진 표시
         if (isCaptured.value) {
+            ingredientViewModel.updateIngredientAddUiState(uri = capturedImageUri)
+
             capturedImageBitmap?.let {
                 Image(
                     bitmap = it.asImageBitmap(),
@@ -240,7 +242,7 @@ fun CenterIngredientInputScreen(
                 .padding(8.dp)
                 .fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
-            enabled = ingredient.name != "" && ingredient.quantity > 0
+            enabled = ingredientAddUiState.name != "" && ingredientAddUiState.quantity > 0
         ) {
             Text(text = "등록하기", fontSize = 16.sp)
         }

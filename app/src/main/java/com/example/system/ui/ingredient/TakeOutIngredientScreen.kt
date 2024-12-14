@@ -1,5 +1,6 @@
 package com.example.system.ui.ingredient
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -75,12 +75,10 @@ fun CenterIngredientOutputScreen(
     modifier: Modifier = Modifier,
     ingredientViewModel: IngredientViewModel = hiltViewModel()
 ) {
-    ingredientViewModel.getIngredients()
-
     val ingredients by ingredientViewModel.ingredientList.collectAsState()
+    val ingredientTakeOutUiState by ingredientViewModel.ingredientTakeOutUiState.collectAsState()
 
     LaunchedEffect(ingredients) {
-        ingredientViewModel.getIngredients()
         ingredientViewModel.initIngredientTakeOutUiState()
     }
 
@@ -132,17 +130,12 @@ fun CenterIngredientOutputScreen(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
+            if (ingredientTakeOutUiState.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top
             ) {
                 itemsIndexed(ingredients) { index, ingredient ->
-                    var name by remember { mutableStateOf(ingredient.name) }
-                    var quantity by remember { mutableIntStateOf(ingredient.quantity) }
-                    var withdrawQuantity by remember { mutableIntStateOf(0 ) }
-
-                    var tempWithdrawQuantity by remember{ mutableStateOf(withdrawQuantity.toString()) }
-
                     val focusManager = LocalFocusManager.current
 
                     Row(
@@ -152,20 +145,30 @@ fun CenterIngredientOutputScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         EditableTextField(
-                            value = name,
-                            onValueChange = { name = it },
+                            value = ingredient.name,
+                            onValueChange = {  },
                             readOnly = true,
                             modifier = Modifier.weight(1f)
                         )
                         EditableTextField(
-                            value = quantity.toString(),
-                            onValueChange = { quantity = it.toInt() },
+                            value = ingredient.quantity.toString(),
+                            onValueChange = {  },
                             readOnly = true,
                             modifier = Modifier.weight(1f)
                         )
                         EditableTextField(
-                            value = tempWithdrawQuantity,
-                            onValueChange = { tempWithdrawQuantity = it},
+                            value = ingredientTakeOutUiState[index].toString(),
+                            onValueChange = { newText ->
+                                var updatedValue = newText.toIntOrNull() ?: 0
+
+                                if (updatedValue > ingredient.quantity)
+                                    updatedValue = ingredient.quantity
+
+                                if (updatedValue < 0)
+                                    updatedValue = 0
+
+                                ingredientViewModel.updateIngredientTakeOutUiState(index, updatedValue)
+                                            },
                             keyboardActions = KeyboardActions(
                                 onDone = {
                                     focusManager.clearFocus()
@@ -174,26 +177,12 @@ fun CenterIngredientOutputScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .padding(horizontal = 4.dp)
-                                .onFocusChanged { focusState ->
-                                    if (!focusState.isFocused) {
-                                        withdrawQuantity = try {
-                                            tempWithdrawQuantity.toInt()
-                                        } catch (e: Exception) {
-                                            0
-                                        }
-
-                                        if (withdrawQuantity > quantity)
-                                            withdrawQuantity = quantity
-
-                                        tempWithdrawQuantity = withdrawQuantity.toString()
-                                        ingredientViewModel.updateIngredientTakeOutUiState(index, withdrawQuantity)
-                                    }
-                                }
                         )
                     }
                 }
             }
         }
+            }
 
         // 식재료 꺼내기 버튼
         Button(

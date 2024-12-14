@@ -15,14 +15,20 @@ class IngredientRepository @Inject constructor(
 
     suspend fun getAll(): List<Ingredient> = ingredientDao.getAll()
 
-    suspend fun removeIngredient(ingredient: Ingredient) = ingredientDao.delete(ingredient)
+    suspend fun removeIngredient(ingredient: Ingredient, callback: () -> Unit) {
+        ingredientDao.delete(ingredient)
+        callback()
+    }
 
     suspend fun add(ingredient: Ingredient) = ingredientDao.insert(ingredient)
 
     suspend fun getExpiredIngredients(expiredDate: Long): List<Ingredient> =
         ingredientDao.getExpiredIngredients(expiredDate)
 
-    suspend fun updateIngredient(ingredient: Ingredient) = ingredientDao.update(ingredient)
+    suspend fun updateIngredient(ingredient: Ingredient, callback: () -> Unit) {
+        ingredientDao.update(ingredient)
+        callback()
+    }
 
     //suspend fun getIngredientName(imageUri: Uri) = serviceProvider.getOpenAIServiceInstance().getIngredientName()
 
