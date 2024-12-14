@@ -39,14 +39,30 @@ class IngredientViewModel @Inject constructor(
     val expiredIngredientList: StateFlow<List<Ingredient>> = _expiredIngredientList
 
 
-    private val _ingredientAddUiState = MutableStateFlow<List<Ingredient>>(emptyList())
-    val ingredientAddUiState: StateFlow<List<Ingredient>> = _ingredientAddUiState
+
+    //식재료 추가 화면 입력 칸 UI 상태 관리
+    private val _ingredientAddUiState = MutableStateFlow<Ingredient>(Ingredient())
+    val ingredientAddUiState: StateFlow<Ingredient> = _ingredientAddUiState
+
+    //식재료 추가 화면 찍은 사진 보여주는 UI 상태 관리
+    //ai서버로 데이터 보내는 용도
+    private val _capturedImageUri = MutableStateFlow<Uri>(Uri.EMPTY)
+    val capturedImageUri: StateFlow<Uri> = _capturedImageUri
+    
+    //UI에 이미지 표시하는 용도
+    private val _capturedImageBitmap = MutableStateFlow<Bitmap?>(null)
+    val capturedImageBitmap: StateFlow<Bitmap?> = _capturedImageBitmap
+
+
 
     private val _ingredientTakeOutUiState = MutableStateFlow<List<Int>>(emptyList())
     val ingredientTakeOutUiState: StateFlow<List<Int>> = _ingredientTakeOutUiState
 
     private val _ingredientExpirationUiState = MutableStateFlow<List<Ingredient>>(emptyList())
     val ingredientExpirationUiState: StateFlow<List<Ingredient>> = _ingredientExpirationUiState
+
+    private val _autoOrderList = MutableStateFlow<List<OrderItem>>(emptyList())
+    val autoOrderList: StateFlow<List<OrderItem>> = _autoOrderList
 
     private val _autoOrderUiState = MutableStateFlow<List<OrderItem>>(emptyList())
     val autoOrderUiState: StateFlow<List<OrderItem>> = _autoOrderUiState
@@ -69,26 +85,52 @@ class IngredientViewModel @Inject constructor(
 
 
 
-
-    fun addIngredientAddUiState() {
-        _ingredientAddUiState.value += Ingredient()
+    //식재료 추가 화면 UI 관련 함수
+    //텍스트 필드 UI 입력한 경우
+    fun updateIngredientAddUiState(
+        name: String = _ingredientAddUiState.value.name,
+        quantity: Int = _ingredientAddUiState.value.quantity,
+        expirationDate: Long = _ingredientAddUiState.value.expirationDate
+    ) {
+        _ingredientAddUiState.value.name = name
+        _ingredientAddUiState.value.quantity = quantity
+        _ingredientAddUiState.value.expirationDate = expirationDate
     }
 
-    fun updateIngredientAddUiState(index: Int, ingredient: Ingredient) {
-        val updatedIngredientList = _ingredientAddUiState.value.toMutableList()
-        updatedIngredientList[index] = ingredient
-        _ingredientAddUiState.value = updatedIngredientList
-    }
-
-    fun addIngredients() {
+    //식재료 추가 버튼 누른 경우
+    fun addIngredient() {
         viewModelScope.launch {
-            for (ingredient in _ingredientAddUiState.value) {
-                ingredientRepository.add(ingredient)
-            }
-
-            _ingredientAddUiState.value = emptyList()
+            ingredientRepository.add(_ingredientAddUiState.value)
+            _ingredientAddUiState.value = Ingredient()
         }
     }
+    
+    //카메라로 등록하기 버튼 누른 경우
+    fun captureIngredient(
+        context: Context,
+        cameraLauncher: ManagedActivityResultLauncher<Void?, Bitmap?>
+    ) {
+        image.captureImage(context, cameraLauncher)
+        _capturedImageUri.value = image.getImageUri()
+    }
+
+    //UI에 표시되는 bitmap 이미지 변경
+    fun updateCapturedImageBitmapState(bitmap: Bitmap?) {
+        _capturedImageBitmap.value = bitmap
+    }
+
+    //카메라 찍고 다시 안 찍고 확인을 누르는 경우 AI서버로부터 식재료의 이름을 인식
+    fun recognizeIngredientFromImage() {
+        if (_capturedImageUri.value != Uri.EMPTY) {
+            viewModelScope.launch {
+                //_ingredientAddUiState.value.name = ingredientRepository.getIngredientName(imageUri)
+                _ingredientAddUiState.value.name = "사과"
+            }
+        }
+    }
+
+
+
 
 
 
@@ -158,6 +200,7 @@ class IngredientViewModel @Inject constructor(
 
     fun getAutoOrderItems() {
         viewModelScope.launch {
+            _autoOrderList.value = ingredientRepository.getAllAutoOrderItems()
             _autoOrderUiState.value = ingredientRepository.getAllAutoOrderItems()
         }
     }
@@ -168,6 +211,10 @@ class IngredientViewModel @Inject constructor(
 
 
     fun addAutoOrder() {
+        _autoOrderUiState.value += OrderItem(name = "")
+    }
+
+    fun insertAutoOrder() {
         viewModelScope.launch {
             for (orderItem in _autoOrderUiState.value)
                 ingredientRepository.addAutoOrder(orderItem)
@@ -197,20 +244,5 @@ class IngredientViewModel @Inject constructor(
 
 
 
-    fun captureIngredient(
-        context: Context,
-        cameraLauncher: ManagedActivityResultLauncher<Void?, Bitmap?>
-    ) {
-        image.captureImage(context, cameraLauncher)
-    }
 
-    fun recognizeIngredientFromImage() {
-        val imageUri = image.getImageUri()
-
-        if (imageUri != Uri.EMPTY) {
-            viewModelScope.launch {
-                //capturedIngredient.value.name = ingredientRepository.getIngredientName(imageUri)
-            }
-        }
-    }
 }

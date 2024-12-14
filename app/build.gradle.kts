@@ -100,6 +100,7 @@ dependencies {
     //noinspection GradleDependency
     implementation(libs.androidx.activity.compose.v160)
     implementation(libs.accompanist.permissions)
+    implementation(libs.coil.compose)
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")

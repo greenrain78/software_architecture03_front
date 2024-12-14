@@ -9,7 +9,6 @@ import android.provider.MediaStore
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,32 +20,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableLongStateOf
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
@@ -67,6 +58,8 @@ import java.time.format.DateTimeFormatter
 
 @Composable
 fun AddIngredientScreen(navController: NavHostController) {
+    val isCaptured = remember { mutableStateOf(false) }
+
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -82,20 +75,27 @@ fun AddIngredientScreen(navController: NavHostController) {
             modifier = Modifier
                 .weight(2f)
                 .fillMaxHeight()
-                .background(Color.White)
+                .background(Color.White),
+            isCaptured = isCaptured
         )
         RightIngredientInputScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxHeight()
                 .background(Color.LightGray),
+            isCaptured = isCaptured
         )
     }
 }
 
 @Composable
-fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewModel: IngredientViewModel = hiltViewModel()) {
-    val ingredients by ingredientViewModel.ingredientAddUiState.collectAsState()
+fun CenterIngredientInputScreen(
+    modifier: Modifier = Modifier,
+    ingredientViewModel: IngredientViewModel = hiltViewModel(),
+    isCaptured: MutableState<Boolean>
+    ) {
+    val ingredient by ingredientViewModel.ingredientAddUiState.collectAsState()
+    val capturedImageBitmap by ingredientViewModel.capturedImageBitmap.collectAsState()
 
     Column(
         modifier = modifier
@@ -146,110 +146,101 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMod
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            LazyColumn(
-                modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(8.dp) // 목록 간격 설정
+            var tempQuantity by remember { mutableStateOf("0") }
+            var tempExpiryDate by remember { mutableStateOf(LocalDate.now().toString().replace("-", ".")) }
+
+            val focusManager = LocalFocusManager.current
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically // 수직 정렬 추가
             ) {
-                itemsIndexed(ingredients) { index, ingredient ->
-                    var tempName by remember { mutableStateOf("") }
-                    var tempQuantity by remember { mutableStateOf("0") }
-                    var tempExpiryDate by remember { mutableStateOf(LocalDate.now().toString().replace("-", ".")) }
+                EditableTextField(
+                    value = ingredient.name,
+                    onValueChange = {},
+                    readOnly = true,
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
+                )
+                EditableTextField(
+                    value = tempQuantity,
+                    onValueChange = { tempQuantity = it },
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    ),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = 4.dp)
+                        .onFocusChanged { focusState ->
+                            if (!focusState.isFocused) {
+                                val quantity = tempQuantity.toIntOrNull() ?: 0
+                                tempQuantity = quantity.toString()
+                                ingredientViewModel.updateIngredientAddUiState(quantity = quantity)
+                            }
+                        }
+                )
+                EditableTextField(
+                    value = tempExpiryDate,
+                    onValueChange = { newValue ->
+                        tempExpiryDate = newValue
+                    },
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            focusManager.clearFocus()
+                        }
+                    ),
+                    modifier = Modifier
+                        .weight(1.5f)
+                        .padding(horizontal = 4.dp)
+                        .onFocusChanged { focusState ->
+                            if (!focusState.isFocused) {
+                                val expiryDate = try {
+                                    LocalDate.parse(
+                                        tempExpiryDate,
+                                        DateTimeFormatter.ofPattern("yyyy.MM.dd")
+                                    )
+                                } catch (e: Exception) {
+                                    LocalDate.now()
+                                }
 
-                    val focusManager = LocalFocusManager.current
-
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically // 수직 정렬 추가
-                    ) {
-                        EditableTextField(
-                            value = tempName,
-                            onValueChange = { tempName = it },
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    focusManager.clearFocus()
-                                }
-                            ),
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp)
-                                .onFocusChanged { focusState ->
-                                    if (!focusState.isFocused) {
-                                        ingredientViewModel.updateIngredientAddUiState(index = index, ingredient.copy(name = tempName))
-                                    }
-                                }
-                        )
-                        EditableTextField(
-                            value = tempQuantity,
-                            onValueChange = { tempQuantity = it},
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    focusManager.clearFocus()
-                                }
-                            ),
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp)
-                                .onFocusChanged { focusState ->
-                                    if (!focusState.isFocused) {
-                                        val quantity = tempQuantity.toIntOrNull() ?: 0
-                                        tempQuantity = quantity.toString()
-                                        ingredientViewModel.updateIngredientAddUiState(index = index, ingredient.copy(quantity = quantity))
-                                    }
-                                }
-                        )
-                        EditableTextField(
-                            value = tempExpiryDate,
-                            onValueChange = { newValue ->
-                                tempExpiryDate = newValue
-                            },
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    focusManager.clearFocus()
-                                }
-                            ),
-                            modifier = Modifier
-                                .weight(1.5f)
-                                .padding(horizontal = 4.dp)
-                                .onFocusChanged { focusState ->
-                                    if (!focusState.isFocused) {
-                                        val expiryDate = try {
-                                            LocalDate.parse(tempExpiryDate, DateTimeFormatter.ofPattern("yyyy.MM.dd"))
-                                        } catch (e: Exception) {
-                                            LocalDate.now()
-                                        }
-
-                                        tempExpiryDate = expiryDate.toString().replace("-", ".")
-                                        ingredientViewModel.updateIngredientAddUiState(index = index, ingredient.copy(expirationDate = fromLocalDate(expiryDate)!!))
-                                    }
-                                }
-                        )
-                    }
-                }
+                                tempExpiryDate = expiryDate.toString().replace("-", ".")
+                                ingredientViewModel.updateIngredientAddUiState(expirationDate = fromLocalDate(expiryDate)!!)
+                            }
+                        }
+                )
             }
         }
 
-        // 작성칸 추가 버튼
-        Button(
-            onClick = {
-                ingredientViewModel.addIngredientAddUiState()
-            },
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp)
-        ) {
-            Text(text = "식재료 작성칸 추가", fontSize = 16.sp)
+        //사진 찍은 후 사진 표시
+        if (isCaptured.value) {
+            capturedImageBitmap?.let {
+                Image(
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = "Captured Image",
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
+                    contentScale = ContentScale.Fit
+                )
+            }
         }
 
         // 등록하기 버튼
         Button(
-            onClick = { ingredientViewModel.addIngredients() },
+            onClick = {
+                ingredientViewModel.addIngredient()
+                ingredientViewModel.updateCapturedImageBitmapState(null)
+                      },
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
-            shape = RoundedCornerShape(8.dp)
+            shape = RoundedCornerShape(8.dp),
+            enabled = ingredient.name != "" && ingredient.quantity > 0
         ) {
             Text(text = "등록하기", fontSize = 16.sp)
         }
@@ -257,14 +248,22 @@ fun CenterIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMod
 }
 
 @Composable
-fun RightIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewModel: IngredientViewModel = hiltViewModel()) {
+fun RightIngredientInputScreen(
+    modifier: Modifier = Modifier,
+    ingredientViewModel: IngredientViewModel = hiltViewModel(),
+    isCaptured: MutableState<Boolean>,
+) {
     val context = LocalContext.current
-    //val capturedIngredient by ingredientViewModel.capturedIngredient.collectAsState()
+    val hasPermission = remember { mutableStateOf(false) }
 
     // 카메라 권한을 요청했을 때의 로직 코드
     val requestPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
-    ) {}
+    ) { isGranted ->
+        if (isGranted) {
+            hasPermission.value = true
+        }
+    }
 
     // 카메라 촬영 이후 로직 코드
     val takePhotoLauncher = rememberLauncherForActivityResult(
@@ -284,10 +283,21 @@ fun RightIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMode
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 contentValues
             )
-
+            
             if (uri != null) {
-                //ingredientViewModel.recognizeIngredientFromImage()
-                Log.d("CameraScreen", "capture complete")
+                try {
+                    //uri 경로에 사진 저장
+                    context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                        takenPhoto.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+
+                        ingredientViewModel.updateCapturedImageBitmapState(takenPhoto)
+                        ingredientViewModel.recognizeIngredientFromImage()
+                        isCaptured.value = true
+                        Log.d("CameraScreen", "Image saved at $uri")
+                    }
+                } catch (e: Exception) {
+                    Log.e("CameraScreen", "Failed to save image", e)
+                }
             } else {
                 Log.d("CameraScreen", "Failed to capture image.")
             }
@@ -304,7 +314,6 @@ fun RightIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMode
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA)
             }
-
         },
         modifier = modifier
             .fillMaxSize()
@@ -318,7 +327,12 @@ fun RightIngredientInputScreen(modifier: Modifier = Modifier, ingredientViewMode
             color = Color.White
         )
     }
-    
+
+    //카메라 권한을 처음 승인한 경우
+    if (hasPermission.value) {
+        ingredientViewModel.captureIngredient(context, takePhotoLauncher)
+        hasPermission.value = false
+    }
 }
 
 
