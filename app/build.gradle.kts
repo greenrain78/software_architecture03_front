@@ -28,7 +28,7 @@ android {
             useSupportLibrary = true
         }
 
-        buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_KEY"))
+        //buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_KEY"))
     }
 
     buildTypes {
@@ -77,6 +77,8 @@ dependencies {
     implementation(libs.places)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -98,14 +100,14 @@ dependencies {
     //noinspection GradleDependency
     implementation(libs.androidx.activity.compose.v160)
     implementation(libs.accompanist.permissions)
+    implementation(libs.coil.compose)
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
-// Retrofit with Scalar Converter
+    // Retrofit with Scalar Converter
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    // Hilt Dependency Injection
-    implementation("com.google.dagger:hilt-android:2.51.1")
-    kapt("com.google.dagger:hilt-android-compiler:2.51.1")
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
+    implementation(libs.hilt.android)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 }

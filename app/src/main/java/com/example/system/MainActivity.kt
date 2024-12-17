@@ -45,7 +45,6 @@ fun AppNavHost(navController: NavHostController) {
 
         composable("ingredient") { NewIngredientScreen(navController) }
         composable("addIngredient") { AddIngredientScreen(navController) }
-//        composable("camera") { CameraScreen() }
         composable("takeOutIngredient") { TakeOutIngredientScreen(navController) }
         composable("ingredientExpirationDate") { IngredientExpirationDateScreen(navController) }
 
@@ -59,4 +58,3 @@ fun AppNavHost(navController: NavHostController) {
     }
 
 }
-
