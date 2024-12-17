@@ -4,7 +4,6 @@ import com.example.system.data.repository.IngredientRepository
 import com.example.system.data.repository.OrderRepository
 import com.example.system.data.repository.RecipeRepository
 import com.example.system.ingredientsDB.IngredientDao
-import com.example.system.ingredientsDB.OrderItemDao
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -26,12 +25,10 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun bindIngredientRepository(
-        ingredientDao: IngredientDao,
-        orderItemDao: OrderItemDao
+        ingredientDao: IngredientDao
     ): IngredientRepository {
         return IngredientRepository(
-            ingredientDao,
-            orderItemDao
+            ingredientDao
         )
     }
 

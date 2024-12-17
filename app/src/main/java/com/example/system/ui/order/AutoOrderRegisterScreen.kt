@@ -17,9 +17,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,10 +41,6 @@ fun AutoOrderRegisterScreen(
     ingredientViewModel: IngredientViewModel = hiltViewModel(),
     recipeViewModel: RecipeViewModel = hiltViewModel()
 ) {
-    LaunchedEffect(key1 = Unit) {
-        ingredientViewModel.getAutoOrderItems()
-    }
-
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -72,12 +65,14 @@ fun AutoOrderRegisterScreen(
 }
 
 @Composable
-fun CenterMarketAutoScreen(
-    modifier: Modifier = Modifier,
-    navController: NavHostController,
-    ingredientViewModel: IngredientViewModel = hiltViewModel()
-) {
-    val autoOrderList by ingredientViewModel.autoOrderUiState.collectAsState()
+fun CenterMarketAutoScreen(modifier: Modifier = Modifier, navController: NavHostController) {
+    val itemsList = remember {
+        mutableStateListOf(
+            Pair(mutableStateOf("사과"), mutableStateOf("100")),
+            Pair(mutableStateOf("양파"), mutableStateOf("500")),
+            Pair(mutableStateOf("감자"), mutableStateOf("100"))
+        )
+    }
 
     Column(
         modifier = modifier
@@ -120,7 +115,7 @@ fun CenterMarketAutoScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                //.background(Color.Transparent) // 배경 투명 설정
+                .background(Color.Transparent) // 배경 투명 설정
                 .padding(8.dp)
         ) {
 
@@ -136,7 +131,7 @@ fun CenterMarketAutoScreen(
                     onValueChange = {  },
                     modifier = Modifier
                         .weight(1f)
-                        //.background(Color.White, RoundedCornerShape(8.dp))
+                        .background(Color.White, RoundedCornerShape(8.dp))
                         .padding(4.dp),
                     singleLine = true,
                     placeholder = { Text("상품명을 입력하세요") }
@@ -148,7 +143,7 @@ fun CenterMarketAutoScreen(
                     onValueChange = {  },
                     modifier = Modifier
                         .weight(1f)
-                        //.background(Color.White, RoundedCornerShape(8.dp))
+                        .background(Color.White, RoundedCornerShape(8.dp))
                         .padding(4.dp),
                     singleLine = true,
                     placeholder = { Text("수량을 입력하세요") }
@@ -157,19 +152,9 @@ fun CenterMarketAutoScreen(
         }
     }
 
-    Button(
-        onClick = { ingredientViewModel.addAutoOrder() },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        shape = RoundedCornerShape(8.dp) // 모서리 둥근 사각형
-    ) {
-        Text(text = "주문 내역 추가", fontSize = 16.sp)
-    }
-
     // 버튼 영역
     Button(
-        onClick = { ingredientViewModel.addAutoOrder() },
+        onClick = { /* 저장 처리 로직 추가 */ },
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp),

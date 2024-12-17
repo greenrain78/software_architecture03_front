@@ -1,6 +1,7 @@
 package com.example.system.ui.ingredient
 
-import android.util.Log
+import androidx.compose.runtime.Composable
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,44 +13,30 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.system.ui.component.EditableTextField
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
-import com.example.system.ui.viewmodel.IngredientViewModel
 
 @Composable
-fun TakeOutIngredientScreen(
-    navController: NavHostController,
-    ingredientViewModel: IngredientViewModel = hiltViewModel()
-) {
-    LaunchedEffect(key1 = true) {
-        ingredientViewModel.getIngredients()
-    }
-
+fun TakeOutIngredientScreen(navController: NavHostController) {
     ForceLandscapeOrientation()
     Row(
         modifier = Modifier.fillMaxSize()
@@ -71,15 +58,17 @@ fun TakeOutIngredientScreen(
 }
 
 @Composable
-fun CenterIngredientOutputScreen(
-    modifier: Modifier = Modifier,
-    ingredientViewModel: IngredientViewModel = hiltViewModel()
-) {
-    val ingredients by ingredientViewModel.ingredientList.collectAsState()
-    val ingredientTakeOutUiState by ingredientViewModel.ingredientTakeOutUiState.collectAsState()
-
-    LaunchedEffect(ingredients) {
-        ingredientViewModel.initIngredientTakeOutUiState()
+fun CenterIngredientOutputScreen(modifier: Modifier = Modifier) {
+    val ingredients = remember {
+        mutableStateListOf(
+            Triple("계란", "100", "10"),
+            Triple("계란", "100", "10"),
+            Triple("계란", "100", ""),
+            Triple("계란", "100", ""),
+            Triple("계란", "100", ""),
+            Triple("계란", "100", ""),
+            Triple("양파", "500", "100")
+        )
     }
 
     Column(
@@ -130,13 +119,16 @@ fun CenterIngredientOutputScreen(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            if (ingredientTakeOutUiState.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.Top
             ) {
-                itemsIndexed(ingredients) { index, ingredient ->
-                    val focusManager = LocalFocusManager.current
+                items(ingredients) { ingredient ->
+                    val index = ingredients.indexOf(ingredient)
+
+                    var name by remember { mutableStateOf(ingredient.first) }
+                    var quantity by remember { mutableStateOf(ingredient.second) }
+                    var withdrawQuantity by remember { mutableStateOf(ingredient.third) }
 
                     Row(
                         modifier = Modifier
@@ -145,50 +137,28 @@ fun CenterIngredientOutputScreen(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         EditableTextField(
-                            value = ingredient.name,
-                            onValueChange = {  },
-                            readOnly = true,
+                            value = name,
+                            onValueChange = { name = it },
                             modifier = Modifier.weight(1f)
                         )
                         EditableTextField(
-                            value = ingredient.quantity.toString(),
-                            onValueChange = {  },
-                            readOnly = true,
+                            value = quantity,
+                            onValueChange = { quantity = it },
                             modifier = Modifier.weight(1f)
                         )
                         EditableTextField(
-                            value = ingredientTakeOutUiState[index].toString(),
-                            onValueChange = { newText ->
-                                var updatedValue = newText.toIntOrNull() ?: 0
-
-                                if (updatedValue > ingredient.quantity)
-                                    updatedValue = ingredient.quantity
-
-                                if (updatedValue < 0)
-                                    updatedValue = 0
-
-                                ingredientViewModel.updateIngredientTakeOutUiState(index, updatedValue)
-                                            },
-                            keyboardActions = KeyboardActions(
-                                onDone = {
-                                    focusManager.clearFocus()
-                                }
-                            ),
-                            modifier = Modifier
-                                .weight(1f)
-                                .padding(horizontal = 4.dp)
+                            value = withdrawQuantity,
+                            onValueChange = { withdrawQuantity = it },
+                            modifier = Modifier.weight(1f)
                         )
                     }
                 }
             }
         }
-            }
 
         // 식재료 꺼내기 버튼
         Button(
-            onClick = {
-                ingredientViewModel.takeoutIngredient()
-            },
+            onClick = { /* 꺼내기 처리 로직 추가 */ },
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
