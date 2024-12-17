@@ -1,5 +1,8 @@
 package com.example.system.data.repository
 
+import android.net.Uri
+import com.example.system.data.remote.api.request.ai.AIRequest
+import com.example.system.data.remote.network.ServiceProvider
 import com.example.system.ingredientsDB.Ingredient
 import com.example.system.ingredientsDB.IngredientDao
 import com.example.system.ingredientsDB.OrderItem
@@ -11,7 +14,7 @@ class IngredientRepository @Inject constructor(
     private val orderItemDao: OrderItemDao
 ) {
 
-    //private val serviceProvider: ServiceProvider = ServiceProvider
+    private val openAIService = ServiceProvider.getOpenAIServiceInstance()
 
     suspend fun getAll(): List<Ingredient> = ingredientDao.getAll()
 
@@ -32,7 +35,17 @@ class IngredientRepository @Inject constructor(
 
     //suspend fun getIngredientName(imageUri: Uri) = serviceProvider.getOpenAIServiceInstance().getIngredientName()
 
+    // GPT 요청 보내는 로직
+    suspend fun getPrompt(imageUri: Uri): String? {
 
+        val request = AIRequest().apply {
+            this.messages[0].content[0].imageUrl.url = imageUri
+        }
+
+        val response = openAIService.recognizeImage(request)
+
+        return response.body()?.choices?.get(0)?.message?.content
+    }
 
 
     suspend fun addAutoOrder(orderItem: OrderItem) = orderItemDao.insert(orderItem)
@@ -41,5 +54,5 @@ class IngredientRepository @Inject constructor(
 
     suspend fun deleteAutoOrder(orderItem: OrderItem) = orderItemDao.delete(orderItem)
 
-    suspend fun getAllAutoOrderItems() : List<OrderItem> = orderItemDao.getAutoOrderItems()
+    suspend fun getAllAutoOrderItems(): List<OrderItem> = orderItemDao.getAutoOrderItems()
 }

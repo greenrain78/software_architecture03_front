@@ -1,5 +1,6 @@
 package com.example.system.data.remote.api.request.ai
 
+import android.net.Uri
 import com.google.gson.annotations.SerializedName
 
 data class AIRequest(
@@ -9,7 +10,7 @@ data class AIRequest(
         Message(
             content = listOf(
                 Content(
-                    imageUrl = ImageUrl("https://example.com/image.jpg"),
+                    imageUrl = ImageUrl(),
                     type = "image_url"
                 ),
                 Content(
@@ -25,13 +26,13 @@ data class AIRequest(
 
 data class Content(
     @SerializedName("image_url")
-    val imageUrl: ImageUrl = ImageUrl(""),
+    val imageUrl: ImageUrl = ImageUrl(),
     val text: String = "",
     val type: String
 )
 
 data class ImageUrl(
-    val url: String
+    var url: Uri = Uri.parse("")
 )
 
 data class Message(
