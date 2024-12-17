@@ -17,12 +17,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 class RecipeViewModel @Inject constructor(
     private val recipeRepository: RecipeRepository,
     private val ingredientRepository: IngredientRepository
 ) : ViewModel() {
+
+//    private val recipeRepository = RecipeRepository()
+//    private val ingredientRepository = IngredientRepository()
+
+
     var recipeUiState = MutableStateFlow<List<Recipe>>(emptyList())
 
     var recommendUiState = MutableStateFlow(Recipe())

@@ -5,15 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.example.system.data.repository.OrderRepository
 import com.example.system.ingredientsDB.Ingredient
 import com.example.system.data.repository.IngredientRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
 class OrderViewModel @Inject constructor(
     private val ingredientRepository: IngredientRepository,
     private val orderRepository: OrderRepository
 ) : ViewModel() {
+
+//    private val ingredientRepository = IngredientRepository(context)
+//    private val orderRepository = OrderRepository(context)
 
     fun registerAutomaticOrder(ingredient: Ingredient) {
         viewModelScope.launch {
