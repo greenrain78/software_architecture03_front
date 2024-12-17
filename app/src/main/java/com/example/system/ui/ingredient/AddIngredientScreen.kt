@@ -30,6 +30,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -92,7 +93,7 @@ fun CenterIngredientInputScreen(
     modifier: Modifier = Modifier,
     ingredientViewModel: IngredientViewModel = hiltViewModel(),
     isCaptured: MutableState<Boolean>
-    ) {
+) {
     val ingredientAddUiState by ingredientViewModel.ingredientAddUiState.collectAsState()
     val capturedImageBitmap by ingredientViewModel.capturedImageBitmap.collectAsState()
     val capturedImageUri by ingredientViewModel.capturedImageUri.collectAsState()
@@ -146,7 +147,11 @@ fun CenterIngredientInputScreen(
                 .fillMaxWidth()
                 .weight(1f)
         ) {
-            var tempExpiryDate by remember { mutableStateOf(LocalDate.now().toString().replace("-", ".")) }
+            var tempExpiryDate by remember {
+                mutableStateOf(
+                    LocalDate.now().toString().replace("-", ".")
+                )
+            }
 
             val focusManager = LocalFocusManager.current
 
@@ -208,8 +213,14 @@ fun CenterIngredientInputScreen(
                                     LocalDate.now()
                                 }
 
-                                tempExpiryDate = expiryDate.toString().replace("-", ".")
-                                ingredientViewModel.updateIngredientAddUiState(expirationDate = fromLocalDate(expiryDate)!!)
+                                tempExpiryDate = expiryDate
+                                    .toString()
+                                    .replace("-", ".")
+                                ingredientViewModel.updateIngredientAddUiState(
+                                    expirationDate = fromLocalDate(
+                                        expiryDate
+                                    )!!
+                                )
                             }
                         }
                 )
@@ -218,7 +229,7 @@ fun CenterIngredientInputScreen(
 
         //사진 찍은 후 사진 표시
         if (isCaptured.value) {
-            ingredientViewModel.updateIngredientAddUiState(uri = capturedImageUri)
+//            ingredientViewModel.updateIngredientAddUiState(uri = capturedImageUri)
 
             capturedImageBitmap?.let {
                 Image(
@@ -237,7 +248,7 @@ fun CenterIngredientInputScreen(
             onClick = {
                 ingredientViewModel.addIngredient()
                 ingredientViewModel.updateCapturedImageBitmapState(null)
-                      },
+            },
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
@@ -285,7 +296,7 @@ fun RightIngredientInputScreen(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 contentValues
             )
-            
+
             if (uri != null) {
                 try {
                     //uri 경로에 사진 저장
@@ -293,7 +304,7 @@ fun RightIngredientInputScreen(
                         takenPhoto.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
 
                         ingredientViewModel.updateCapturedImageBitmapState(takenPhoto)
-                        ingredientViewModel.recognizeIngredientFromImage()
+                        ingredientViewModel.recognizeIngredientFromImage(uri, context)
                         isCaptured.value = true
                         Log.d("CameraScreen", "Image saved at $uri")
                     }
@@ -311,7 +322,11 @@ fun RightIngredientInputScreen(
     Button(
         onClick = {
             //카메라 권한 요청
-            if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            if (ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
                 ingredientViewModel.captureIngredient(context, takePhotoLauncher)
             } else {
                 requestPermissionLauncher.launch(Manifest.permission.CAMERA)

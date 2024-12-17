@@ -1,5 +1,6 @@
 package com.example.system.di
 
+import android.content.ContentResolver
 import com.example.system.data.repository.IngredientRepository
 import com.example.system.data.repository.OrderRepository
 import com.example.system.data.repository.RecipeRepository
@@ -27,11 +28,11 @@ object RepositoryModule {
     @Singleton
     fun bindIngredientRepository(
         ingredientDao: IngredientDao,
-        orderItemDao: OrderItemDao
+        orderItemDao: OrderItemDao,
     ): IngredientRepository {
         return IngredientRepository(
             ingredientDao,
-            orderItemDao
+            orderItemDao,
         )
     }
 
