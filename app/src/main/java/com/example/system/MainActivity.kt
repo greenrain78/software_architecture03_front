@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
 
                     fromLocalDate(LocalDate.of(2024, 12, 31))?.let {
                         ingredientViewModel.updateIngredientAddUiState(
-                            name = "상추", quantity = 200,
+                            name = "물", quantity = 200,
                             expirationDate = it
                         )
                     }
@@ -57,9 +57,16 @@ class MainActivity : ComponentActivity() {
                         )
                     }
                     ingredientViewModel.addIngredient()
+                    fromLocalDate(LocalDate.of(2025, 1, 22))?.let {
+                        ingredientViewModel.updateIngredientAddUiState(
+                            name = "양파", quantity = 500,
+                            expirationDate = it
+                        )
+                    }
+                    ingredientViewModel.addIngredient()
                     fromLocalDate(LocalDate.of(2024, 12, 18))?.let {
                         ingredientViewModel.updateIngredientAddUiState(
-                            name = "고기", quantity = 300,
+                            name = "돼지고기", quantity = 300,
                             expirationDate = it
                         )
                     }
