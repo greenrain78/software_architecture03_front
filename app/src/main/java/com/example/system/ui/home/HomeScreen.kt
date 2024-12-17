@@ -20,19 +20,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.system.data.model.Recipe
 import com.example.system.ingredientsDB.Ingredient
+import com.example.system.ingredientsDB.toLocalDate
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
 import com.example.system.ui.viewmodel.IngredientViewModel
@@ -42,13 +42,17 @@ import com.example.system.ui.viewmodel.RecipeViewModel
 fun HomeScreen(
     navController: NavHostController,
     recipeViewModel: RecipeViewModel = hiltViewModel(),
-    ingredientVIewModel: IngredientViewModel = hiltViewModel()
+    ingredientViewModel: IngredientViewModel = hiltViewModel()
 ) {
 
     LaunchedEffect(key1 = Unit) {
+        ingredientViewModel.getIngredients()
+        ingredientViewModel.getExpiredIngredients()
         recipeViewModel.getRecommendedRecipe()
     }
 
+    val ingredients by ingredientViewModel.ingredientList.collectAsState()
+    val expiredIngredients by ingredientViewModel.expiredIngredientList.collectAsState()
     val recommendedRecipe = recipeViewModel.recommendUiState.collectAsState().value
 
     ForceLandscapeOrientation()
@@ -68,7 +72,8 @@ fun HomeScreen(
                 .weight(1f)
                 .fillMaxHeight()
                 .background(Color.White),
-            recommendedRecipe = recommendedRecipe
+            recommendedRecipe = recommendedRecipe,
+            expiredIngredients = expiredIngredients
         )
 
         RightScreen(
@@ -76,6 +81,7 @@ fun HomeScreen(
                 .weight(1f)
                 .fillMaxHeight()
                 .background(Color.White),
+            ingredients = ingredients
 
             )
     }
@@ -85,15 +91,9 @@ fun HomeScreen(
 @Composable
 fun CenterScreen(
     modifier: Modifier = Modifier,
-    recommendedRecipe: Recipe
+    recommendedRecipe: Recipe,
+    expiredIngredients: List<Ingredient>
 ) {
-    val expiryWarnings = remember {
-        listOf(
-            Pair("사과", "2024.12.12"),
-            Pair("양파", "2024.12.15"),
-            Pair("우유", "2024.12.20")
-        )
-    }
 
     val recipes = remember {
         listOf(
@@ -190,7 +190,7 @@ fun CenterScreen(
                     modifier = Modifier.fillMaxSize(),
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(expiryWarnings) { (item, date) ->
+                    items(expiredIngredients) { ingredient ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -198,13 +198,13 @@ fun CenterScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = item,
+                                text = ingredient.name,
                                 fontSize = 16.sp,
                                 modifier = Modifier.weight(1f),
                                 textAlign = TextAlign.Center
                             )
                             Text(
-                                text = date,
+                                text = toLocalDate(ingredient.expirationDate).toString().replace("-", "."),
                                 fontSize = 16.sp,
                                 modifier = Modifier.weight(1f),
                                 textAlign = TextAlign.Center
@@ -219,15 +219,10 @@ fun CenterScreen(
 
 
 @Composable
-fun RightScreen(modifier: Modifier = Modifier) {
-    val ingredients = remember {
-        listOf(
-            Pair("사과", "100"),
-            Pair("양파", "500"),
-            Pair("우유", "1000")
-        )
-    }
-
+fun RightScreen(
+    modifier: Modifier = Modifier,
+    ingredients: List<Ingredient>
+) {
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -254,7 +249,7 @@ fun RightScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                items(ingredients) { (ingredient, quantity) ->
+                items(ingredients) { ingredient ->
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -263,13 +258,13 @@ fun RightScreen(modifier: Modifier = Modifier) {
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = ingredient,
+                            text = ingredient.name,
                             fontSize = 16.sp,
                             modifier = Modifier.weight(1f),
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = quantity,
+                            text = ingredient.quantity.toString(),
                             fontSize = 16.sp,
                             modifier = Modifier.weight(1f),
                             textAlign = TextAlign.Center
@@ -281,7 +276,7 @@ fun RightScreen(modifier: Modifier = Modifier) {
     }
 }
 
-
+/*
 @Preview(showBackground = true, widthDp = 600, heightDp = 400)
 @Composable
 fun HomeScreenPreview() {
@@ -302,3 +297,4 @@ fun HomeScreenPreview2() {
     RightScreen(
     )
 }
+ */
