@@ -1,5 +1,6 @@
 package com.example.system.di
 
+import android.content.ContentResolver
 import android.content.Context
 import androidx.room.Room
 import com.example.system.ingredientsDB.IngredientDB
@@ -32,4 +33,5 @@ object DatabaseModule {
 
     @Provides
     fun provideOrderItemDao(database: IngredientDB): OrderItemDao = database.OrderItemDao()
+
 }

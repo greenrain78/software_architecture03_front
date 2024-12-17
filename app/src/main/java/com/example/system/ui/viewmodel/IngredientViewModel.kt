@@ -2,7 +2,10 @@ package com.example.system.ui.viewmodel
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Base64
+import android.util.Log
 import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,17 +18,19 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
 class IngredientViewModel @Inject constructor(
-    private val ingredientRepository: IngredientRepository
+    private val ingredientRepository: IngredientRepository,
 ) : ViewModel() {
 
     private val image: ImageLoader = ImageLoader()
 
-    
+
     //db에 있는 식재료 리스트
     private val _ingredientList = MutableStateFlow<List<Ingredient>>(emptyList())
     val ingredientList: StateFlow<List<Ingredient>> = _ingredientList
@@ -33,7 +38,6 @@ class IngredientViewModel @Inject constructor(
     //db에 있는 유통 기한 지난 식재료 리스트
     private val _expiredIngredientList = MutableStateFlow<List<Ingredient>>(emptyList())
     val expiredIngredientList: StateFlow<List<Ingredient>> = _expiredIngredientList
-
 
 
     //식재료 추가 화면 입력 칸 UI 상태 관리
@@ -44,7 +48,7 @@ class IngredientViewModel @Inject constructor(
     //ai서버로 데이터 보내는 용도
     private val _capturedImageUri = MutableStateFlow<Uri>(Uri.EMPTY)
     val capturedImageUri: StateFlow<Uri> = _capturedImageUri
-    
+
     //UI에 이미지 표시하는 용도
     private val _capturedImageBitmap = MutableStateFlow<Bitmap?>(null)
     val capturedImageBitmap: StateFlow<Bitmap?> = _capturedImageBitmap
@@ -58,14 +62,12 @@ class IngredientViewModel @Inject constructor(
     private val _ingredientExpirationUiState = MutableStateFlow<List<Ingredient>>(emptyList())
     val ingredientExpirationUiState: StateFlow<List<Ingredient>> = _ingredientExpirationUiState
 
-    
-    
+
     private val _autoOrderList = MutableStateFlow<List<OrderItem>>(emptyList())
     val autoOrderList: StateFlow<List<OrderItem>> = _autoOrderList
 
     private val _autoOrderUiState = MutableStateFlow<List<OrderItem>>(emptyList())
     val autoOrderUiState: StateFlow<List<OrderItem>> = _autoOrderUiState
-
 
 
     //식재료 리스트 갱신
@@ -78,11 +80,10 @@ class IngredientViewModel @Inject constructor(
     //유통 기한 지난 식재료 리스트 갱신
     fun getExpiredIngredients() {
         viewModelScope.launch {
-            _expiredIngredientList.value = ingredientRepository.getExpiredIngredients(fromLocalDate(LocalDate.now())!!)
+            _expiredIngredientList.value =
+                ingredientRepository.getExpiredIngredients(fromLocalDate(LocalDate.now())!!)
         }
     }
-
-
 
 
     //식재료 추가 화면 UI 관련 함수
@@ -108,7 +109,7 @@ class IngredientViewModel @Inject constructor(
             _ingredientAddUiState.value = Ingredient()
         }
     }
-    
+
     //카메라로 등록하기 버튼 누른 경우
     fun captureIngredient(
         context: Context,
@@ -124,17 +125,49 @@ class IngredientViewModel @Inject constructor(
     }
 
     //카메라 찍은 후 확인을 누르는 경우 AI서버로부터 식재료의 이름을 인식
-    fun recognizeIngredientFromImage() {
+    fun recognizeIngredientFromImage(
+        imageUri: Uri,
+        context: Context
+    ) {
         if (_capturedImageUri.value != Uri.EMPTY) {
             viewModelScope.launch {
-                //_ingredientAddUiState.value.name = ingredientRepository.getIngredientName(imageUri)
-                _ingredientAddUiState.value.name = "사과"
+
+                val base64 = uriToBase64(imageUri, context) ?: ""
+
+                val ingredientName = ingredientRepository.getPrompt(base64)
+                _ingredientAddUiState.value = _ingredientAddUiState.value.copy(name = ingredientName)
+                updateIngredientAddUiState(uri = imageUri)
             }
         }
     }
 
+    private fun uriToBase64(
+        imageUri: Uri,
+        context: Context
+    ): String? {
+        _capturedImageUri.value = imageUri
 
+        return try {
+            // 1. URI에서 Bitmap을 가져오기
+            val contentResolver = context.contentResolver
+            val inputStream: InputStream? = contentResolver.openInputStream(imageUri)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
 
+            // 2. Bitmap을 Base64로 변환
+            val outputStream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream) // JPEG 형식, 100% 품질
+            val imageBytes: ByteArray = outputStream.toByteArray()
+            outputStream.close()
+
+            // Base64 인코딩
+            Base64.encodeToString(imageBytes, Base64.DEFAULT)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            Log.e("IMAGE_ERROR", "Failed to load image: ${e.message}")
+            null
+        }
+    }
 
 
     //식재료 꺼내기 화면 부분 UI 관련 함수
@@ -171,8 +204,6 @@ class IngredientViewModel @Inject constructor(
     }
 
 
-
-
     //식재료 유통기한 변경 화면 부분 UI 관련 함수
     //유통기한 초기화
     fun initIngredientExpirationUiState() {
@@ -198,9 +229,6 @@ class IngredientViewModel @Inject constructor(
     }
 
 
-
-
-
     fun getAutoOrderItems() {
         viewModelScope.launch {
             _autoOrderList.value = ingredientRepository.getAllAutoOrderItems()
@@ -208,7 +236,7 @@ class IngredientViewModel @Inject constructor(
         }
     }
 
-    fun changeOrderUiState(autoOrderList: List<OrderItem>){
+    fun changeOrderUiState(autoOrderList: List<OrderItem>) {
         _autoOrderUiState.value = autoOrderList
     }
 
@@ -243,9 +271,6 @@ class IngredientViewModel @Inject constructor(
             getAutoOrderItems()
         }
     }
-
-
-
 
 
 }

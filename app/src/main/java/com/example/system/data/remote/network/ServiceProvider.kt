@@ -9,10 +9,13 @@ object ServiceProvider {
 
     private val recipeServiceInstance: RecipeService =
         RetrofitObject.receiptRetrofit.create(RecipeService::class.java)
+
     private val openAIServiceInstance: OpenAIService =
         RetrofitObject.openAIRetrofit.create(OpenAIService::class.java)
+
     private val orderServiceInstance: OrderService =
         RetrofitObject.orderRetrofit.create(OrderService::class.java)
+
     private val registerServiceInstance: RegisterService =
         RetrofitObject.registerRetrofit.create(RegisterService::class.java)
 

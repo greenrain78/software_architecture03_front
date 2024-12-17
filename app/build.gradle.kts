@@ -28,7 +28,7 @@ android {
             useSupportLibrary = true
         }
 
-        //buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_KEY"))
+        buildConfigField("String", "GPT_KEY", properties.getProperty("GPT_KEY"))
     }
 
     buildTypes {
