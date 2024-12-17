@@ -342,4 +342,6 @@ fun RightIngredientInputScreen(
 @Composable
 fun PreviewIngredientInputScreen() {
     AddIngredientScreen(navController = rememberNavController())
+
+
 }
