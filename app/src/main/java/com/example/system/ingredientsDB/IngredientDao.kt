@@ -23,4 +23,8 @@ interface IngredientDao {
 
     @Query("SELECT * FROM ingredient WHERE expirationDate < :expirationDate")
     suspend fun getExpiredIngredients(expirationDate : Long) : List<Ingredient>
+
+    //더미 데이터용
+    @Query("DELETE FROM ingredient")
+    suspend fun deleteAll()
 }

@@ -41,7 +41,7 @@ class IngredientViewModel @Inject constructor(
 
 
     //식재료 추가 화면 입력 칸 UI 상태 관리
-    private val _ingredientAddUiState = MutableStateFlow<Ingredient>(Ingredient())
+    private val _ingredientAddUiState = MutableStateFlow(Ingredient())
     val ingredientAddUiState: StateFlow<Ingredient> = _ingredientAddUiState
 
     //식재료 추가 화면 찍은 사진 보여주는 UI 상태 관리
@@ -110,6 +110,14 @@ class IngredientViewModel @Inject constructor(
         }
     }
 
+
+    //더미 데이터 생성용
+    fun deleteAll() {
+        viewModelScope.launch {
+            ingredientRepository.deleteAll()
+        }
+    }
+    
     //카메라로 등록하기 버튼 누른 경우
     fun captureIngredient(
         context: Context,

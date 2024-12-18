@@ -32,11 +32,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.system.data.model.Recipe
 import com.example.system.ingredientsDB.Ingredient
+import com.example.system.ingredientsDB.fromLocalDate
 import com.example.system.ingredientsDB.toLocalDate
 import com.example.system.ui.component.ForceLandscapeOrientation
 import com.example.system.ui.component.LeftScreen
 import com.example.system.ui.viewmodel.IngredientViewModel
 import com.example.system.ui.viewmodel.RecipeViewModel
+import java.time.LocalDate
 
 @Composable
 fun HomeScreen(

@@ -52,6 +52,8 @@ class IngredientRepository @Inject constructor(
 
     //suspend fun getIngredientName(imageUri: Uri) = serviceProvider.getOpenAIServiceInstance().getIngredientName()
 
+    //더미 데이터 용
+    suspend fun deleteAll() = ingredientDao.deleteAll()
     // GPT 요청 보내는 로직
     suspend fun getPrompt(base64: String): String {
 
